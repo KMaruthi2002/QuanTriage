@@ -254,6 +254,17 @@ whole-tumor mark:
 It separates **edema (green), non-enhancing (yellow), and enhancing (red)** tumor — the regions
 clinicians actually distinguish. Shipped as `models/unet_multimodal_brats.pt`.
 
+### Full 3-D U-Net (volumetric)
+
+The capstone: a **3-D U-Net** ([segmentation/unet3d.py](segmentation/unet3d.py)) with volumetric
+convolutions that sees whole sub-volumes and learns through-plane context, trained on 3-D patches
+with sliding-window validation ([segmentation/train3d.py](segmentation/train3d.py)) — also on the
+M5 GPU (MPS handles `Conv3d`).
+
+```bash
+python segmentation/train3d.py --n_volumes 30 --epochs 12
+```
+
 - [segmentation/seg_data.py](segmentation/seg_data.py) — flexible `images/ + masks/` loader (the
   common Kaggle layout) plus a synthetic generator for pipeline validation.
 - [segmentation/train_seg.py](segmentation/train_seg.py) — MPS-accelerated training with **live
