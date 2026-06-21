@@ -16,6 +16,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent
 sys.path.insert(0, str(ROOT / "src"))
+sys.path.insert(0, str(ROOT / "imaging"))
 
 import numpy as np
 import streamlit as st
@@ -57,6 +58,14 @@ def load_bundle(qubits: int, layers: int, epochs: int, seed: int):
     q_prob = qmodel.predict_proba(data.X_test)[:, 1]
     base_prob = {n: baseline_pos_proba(m, data.X_test) for n, m in baselines.items()}
     return data, qmodel, q_prob, base_prob
+
+
+@st.cache_resource(show_spinner="Reconstructing the real tumor in 3-D…")
+def tumor_scan():
+    """Build the real-imaging 3-D tumor figure + radiomics (cached)."""
+    from tumor3d import build_figure
+
+    return build_figure(animate=True, show_brain=True)
 
 
 @st.cache_resource(show_spinner="Computing robustness & interpretability (one-time)…")
@@ -114,8 +123,9 @@ st.markdown(
     "not to miss cancer**, **survives quantum noise**, and **explains its reasoning**."
 )
 
-tab_predict, tab_perf, tab_trust = st.tabs(
-    ["🩺 Predict a patient", "📊 Model performance", "🛡️ Trust & robustness"]
+tab_predict, tab_perf, tab_trust, tab_scan = st.tabs(
+    ["🩺 Predict a patient", "📊 Model performance", "🛡️ Trust & robustness",
+     "🧠 3-D tumor scan"]
 )
 
 # --------------------------------------------------------------------------- #
@@ -233,3 +243,35 @@ with tab_trust:
     c2.subheader("What the model relies on")
     c2.image(str(RESULTS / "feature_importance.png"))
     c2.caption("Permutation importance over real cell-nucleus measurements.")
+
+# --------------------------------------------------------------------------- #
+# Tab 4 — real 3-D tumor scan
+# --------------------------------------------------------------------------- #
+with tab_scan:
+    st.subheader("Real tumor, reconstructed in 3-D")
+    st.markdown(
+        "An **actual brain-MRI volume with a radiologist-drawn tumor segmentation** "
+        "(the open `brain1` sample), reconstructed as a true 3-D surface via marching cubes and "
+        "colored by MRI intensity. Drag to rotate, or hit **▶ Rotate** to orbit it."
+    )
+    fig, feats = tumor_scan()
+    st.plotly_chart(fig, use_container_width=True)
+
+    st.markdown("#### Tumor state — quantified from the real segmentation (radiomics)")
+    a, b, c, d = st.columns(4)
+    a.metric("Volume", f"{feats['tumor_volume_mm3']:.0f} mm³")
+    b.metric("Max diameter", f"{feats['max_diameter_mm']:.0f} mm")
+    c.metric("Sphericity", f"{feats['sphericity']:.2f}", help="1.0 = perfect sphere; lower = more irregular")
+    d.metric("Intensity heterogeneity", f"{feats['intensity_heterogeneity']:.0f}")
+    e, f_, g, h = st.columns(4)
+    e.metric("Surface area", f"{feats['surface_area_mm2']:.0f} mm²")
+    f_.metric("Elongation", f"{feats['elongation']:.2f}")
+    g.metric("Flatness", f"{feats['flatness']:.2f}")
+    h.metric("Tumor voxels", f"{feats['voxel_count']:,}")
+
+    st.info(
+        "**Honest scope note.** This is a *real* segmentation rendered in 3-D and quantified with "
+        "real radiomics — not a stylized shape. It is **not** a quantum prediction on this scan: "
+        "the quantum model on the other tabs is a tabular diagnostic. Linking the quantum model to "
+        "imaging (classifying directly from radiomics/voxels) is the project's research roadmap."
+    )

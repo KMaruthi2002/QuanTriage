@@ -86,9 +86,23 @@ A [Streamlit](https://streamlit.io/) dashboard wraps the model in an interactive
   malignant/benign patient) and get a live verdict: malignant, benign, or *refer to a doctor*.
 - **Model performance** — quantum vs. classical metrics, confusion matrix, ROC, training curve.
 - **Trust & robustness** — selective-prediction stats, noise-robustness and feature-importance charts.
+- **3-D tumor scan** — a *real* brain-MRI volume with a radiologist-drawn tumor segmentation,
+  reconstructed as a true 3-D surface (marching cubes), colored by MRI intensity, rotatable and
+  animated, with the tumor's "state" quantified by real radiomics (volume, sphericity, elongation,
+  intensity heterogeneity).
 - The sidebar's *cost-of-a-missed-cancer* and *confidence* sliders update everything live, so you
   can watch the sensitivity-vs-false-alarm tradeoff move in real time. The quantum circuit trains
   once (cached); interactions after that are instant.
+
+<p align="center">
+  <img src="assets/tumor_3d_preview.png" alt="Real 3-D tumor reconstruction" width="420">
+</p>
+
+> **Honest scope note.** The 3-D scan is a *real* segmentation rendered and quantified — not a
+> stylized shape — but it is **not** a quantum prediction on the scan. The quantum model is the
+> tabular diagnostic; linking it to imaging (classifying from radiomics/voxels) is the roadmap.
+> Generate a standalone interactive version with `python imaging/tumor3d.py` (writes
+> `results/tumor_3d.html`).
 
 ---
 
