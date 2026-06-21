@@ -29,6 +29,39 @@ about **30 seconds** on a laptop.
 
 ---
 
+## Architecture — how it all fits together
+
+<p align="center">
+  <img src="assets/architecture.svg" alt="QuanTriage system architecture" width="820">
+</p>
+
+The system is four layers, top to bottom:
+
+1. **Data sources** — three tabular feeds (the built-in breast-cancer set, the TCGA pan-cancer
+   gene-expression set, and *any CSV you bring* from Kaggle) plus real **brain MRI with tumor
+   masks** (Medical Segmentation Decathlon).
+2. **Models — two families that meet in the middle.**
+   - *Quantum ML* turns a feature vector into a prediction: a variational classifier (swappable
+     **angle / amplitude / data-reuploading** encodings), a **5-class** version for tumor type, and
+     a **PyTorch hybrid** that stacks classical layers with a quantum `TorchLayer`. Any of these
+     runs on a simulator (`default.qubit`, fast `lightning.qubit`) or **real hardware** (IBM
+     Quantum, AWS Braket) through one device switch.
+   - *Medical imaging* answers *where*: a **2-D multi-modal U-Net** (4 MRI channels → tumor
+     sub-regions) and a **3-D U-Net** (volumetric), both GPU-trained on Apple Silicon, plus
+     radiomics and 3-D rendering of the tumor on the organ.
+   - The **bridge** wires them together — radiomics extracted from a segmentation are angle-encoded
+     straight into the quantum circuit.
+3. **Interfaces** — a 6-tab **Streamlit app** for exploring every model, and a **live training
+   studio** where you load your own data and watch epochs, model state, and checkpoints in real time.
+4. **Outputs** — *what* (cancer type), *where* (localization), tumor **sub-regions**, an interactive
+   **3-D tumor on the organ**, **selective prediction** (defer to a doctor when unsure), and honest
+   metrics + saved checkpoints.
+
+Everything is **local and GPU-accelerated** on the M5. It's a research/education platform — real
+and capable — **not a validated medical device**.
+
+---
+
 ## What is a variational quantum classifier?
 
 ```
