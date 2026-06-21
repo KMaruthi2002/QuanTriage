@@ -234,6 +234,26 @@ The U-Net's predicted mask (right column) closely matches the radiologist ground
 and the predicted tumor renders **on the organ** — translucent brain + the located tumor — so you
 see *where* it sits, interactive and rotatable in the app.
 
+### Multi-modal, multi-class sub-region segmentation
+
+Scaling up to **all four MRI modalities** (FLAIR + T1 + T1ce + T2) and **multi-class output** —
+the clinical BraTS sub-regions — via [segmentation/multimodal.py](segmentation/multimodal.py):
+
+```bash
+python segmentation/multimodal.py --n_volumes 60 --epochs 22
+```
+
+On real MRI (60 volumes, ~3 min on M5 GPU) it reaches validation Dice **WT 0.857 · TC 0.712 ·
+ET 0.751**, and on a fully held-out case **WT 0.910 · TC 0.856 · ET 0.851** — at the ~0.90
+whole-tumor mark:
+
+<p align="center">
+  <img src="assets/msd_multimodal_prediction.png" alt="Multi-modal sub-region segmentation" width="460">
+</p>
+
+It separates **edema (green), non-enhancing (yellow), and enhancing (red)** tumor — the regions
+clinicians actually distinguish. Shipped as `models/unet_multimodal_brats.pt`.
+
 - [segmentation/seg_data.py](segmentation/seg_data.py) — flexible `images/ + masks/` loader (the
   common Kaggle layout) plus a synthetic generator for pipeline validation.
 - [segmentation/train_seg.py](segmentation/train_seg.py) — MPS-accelerated training with **live
