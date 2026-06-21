@@ -321,6 +321,27 @@ with tab_scan:
         "dataset (the training-studio / Kaggle path). **Not a medical device.**"
     )
 
+    st.divider()
+    st.markdown("#### 🎯 U-Net localization — predicted tumor in 3-D")
+    sys.path.insert(0, str(ROOT / "segmentation"))
+    from localize_msd import has_msd, list_cases, predicted_figure
+
+    if has_msd():
+        st.caption("Run the shipped multi-modal U-Net on a real MSD brain-MRI case and render the "
+                   "**predicted** tumor on the brain.")
+        case = st.selectbox("MSD case", list_cases(12))
+        if st.button("🎯 Localize in 3-D"):
+            with st.spinner("Segmenting the volume on the GPU…"):
+                fig_p, meta = predicted_figure(case)
+            st.plotly_chart(fig_p, use_container_width=True)
+            st.caption(f"Predicted tumor volume ≈ {meta['tumor_volume_mm3']:,.0f} mm³ "
+                       f"({meta['tumor_voxels']:,} voxels) · case {meta['case']}")
+    else:
+        st.caption("MSD data not present locally (7 GB, not shipped) — showing the shipped result. "
+                   "Run `python segmentation/multimodal.py` after downloading MSD to do this live.")
+        st.image(str(ROOT / "assets" / "msd_tumor_on_organ.png"),
+                 caption="Predicted tumor on the brain (held-out MRI, Dice 0.85)")
+
 # --------------------------------------------------------------------------- #
 # Tab 5 — multi-cancer types
 # --------------------------------------------------------------------------- #
