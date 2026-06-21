@@ -18,7 +18,7 @@ from sklearn.base import BaseEstimator, ClassifierMixin
 class MultiClassQuantumClassifier(BaseEstimator, ClassifierMixin):
     def __init__(self, n_classes, n_qubits=8, n_layers=4, epochs=30,
                  stepsize=0.05, batch_size=32, seed=42, verbose=True,
-                 class_weight="balanced", weight_power=0.75):
+                 class_weight="balanced", weight_power=0.75, on_epoch=None):
         self.n_classes = n_classes
         self.n_qubits = n_qubits
         self.n_layers = n_layers
@@ -32,6 +32,7 @@ class MultiClassQuantumClassifier(BaseEstimator, ClassifierMixin):
         # tempers the strength: 0 = unweighted, 0.5 = sqrt-soft, 1 = full balanced.
         self.class_weight = class_weight
         self.weight_power = weight_power
+        self.on_epoch = on_epoch
 
     def _build(self):
         if self.n_qubits < self.n_classes:
@@ -89,6 +90,10 @@ class MultiClassQuantumClassifier(BaseEstimator, ClassifierMixin):
             acc = float(np.mean(self.predict(X) == y))
             self.history_["loss"].append(loss)
             self.history_["acc"].append(acc)
+            if self.on_epoch:
+                self.on_epoch({"epoch": epoch + 1, "epochs": self.epochs,
+                               "loss": loss, "acc": acc,
+                               "weight_norm": float(np.linalg.norm(np.asarray(weights)))})
             if self.verbose:
                 print(f"  epoch {epoch + 1:2d}/{self.epochs}  loss={loss:.4f}  train_acc={acc:.3f}")
         self.weights_ = weights

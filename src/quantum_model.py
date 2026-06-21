@@ -57,6 +57,7 @@ class QuantumClassifier(BaseEstimator, ClassifierMixin):
         batch_size: int = 24,
         seed: int = 42,
         verbose: bool = True,
+        on_epoch=None,
     ):
         self.n_qubits = n_qubits
         self.n_layers = n_layers
@@ -65,6 +66,8 @@ class QuantumClassifier(BaseEstimator, ClassifierMixin):
         self.batch_size = batch_size
         self.seed = seed
         self.verbose = verbose
+        # optional callback(stats: dict) after each epoch — powers the live studio
+        self.on_epoch = on_epoch
 
     # -- internal helpers ---------------------------------------------------
     def _ensure_circuit(self):
@@ -112,6 +115,11 @@ class QuantumClassifier(BaseEstimator, ClassifierMixin):
             epoch_acc = float(np.mean((self._proba_pos(X) >= 0.5) == y))
             self.history_["loss"].append(epoch_loss)
             self.history_["acc"].append(epoch_acc)
+            stats = {"epoch": epoch + 1, "epochs": self.epochs,
+                     "loss": epoch_loss, "acc": epoch_acc,
+                     "weight_norm": float(np.linalg.norm(np.asarray(weights)))}
+            if self.on_epoch:
+                self.on_epoch(stats)
             if self.verbose:
                 print(
                     f"  epoch {epoch + 1:3d}/{self.epochs}  "
@@ -119,6 +127,21 @@ class QuantumClassifier(BaseEstimator, ClassifierMixin):
                 )
 
         self.weights_ = weights
+        return self
+
+    def save_checkpoint(self, path):
+        """Persist the trained weights + config to an .npz checkpoint."""
+        np.savez(path, weights=np.asarray(self.weights_),
+                 n_qubits=self.n_qubits, n_layers=self.n_layers)
+
+    def load_checkpoint(self, path):
+        """Restore weights from an .npz checkpoint (rebuilds the circuit)."""
+        d = np.load(path)
+        self.n_qubits = int(d["n_qubits"])
+        self.n_layers = int(d["n_layers"])
+        self.classes_ = np.array([0, 1])
+        self._dev, self.circuit_ = _build_qnode(self.n_qubits)
+        self.weights_ = pnp.array(d["weights"], requires_grad=False)
         return self
 
     def predict_proba(self, X):
