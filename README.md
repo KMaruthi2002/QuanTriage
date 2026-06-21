@@ -265,12 +265,18 @@ M5 GPU (MPS handles `Conv3d`).
 python segmentation/train3d.py --n_volumes 30 --epochs 12
 ```
 
-**Honest result.** A partial run (stopped early) reached **val WT 0.711 / TC 0.683 / ET 0.672** —
-the architecture clearly learns (vs. 0.03 untrained), but it's **undertrained and currently behind
-the well-trained 2-D multi-modal model** (WT 0.86 val / 0.91 held-out, clean masks). 3-D U-Nets
-need many more iterations to converge; with full training (more epochs/volumes/augmentation) it
-would surpass the 2-D model, but **as shipped, the 2-D multi-modal checkpoint is the better
-localizer**. The 3-D model is included as the volumetric architecture, ready to train further.
+**Result (trained to convergence, 32 volumes × 16 epochs, ~50 min on M5 GPU):**
+**val WT 0.860 · TC 0.794 · ET 0.734** — on par with the 2-D model on whole-tumor and **better on
+tumor core** (0.794 vs 0.712). On a fully held-out case it reaches **TC 0.915 · ET 0.877**:
+
+<p align="center">
+  <img src="assets/unet3d_prediction.png" alt="3-D U-Net predicted tumor" width="360">
+</p>
+
+The volumetric model sees through-plane context, so it's especially strong on the inner tumor
+sub-regions. Shipped as `models/unet3d_brats.pt`. (Earlier this model was undertrained from an
+interrupted run; trained to completion it is now competitive with — and on core/enhancing, better
+than — the 2-D model.)
 
 - [segmentation/seg_data.py](segmentation/seg_data.py) — flexible `images/ + masks/` loader (the
   common Kaggle layout) plus a synthetic generator for pipeline validation.
