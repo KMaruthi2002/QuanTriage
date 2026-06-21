@@ -21,9 +21,9 @@ from pathlib import Path
 
 import numpy as np
 
-from baselines import baseline_pos_proba, train_baselines
-from data import load_data
-from evaluation import (
+from qml_oncology.baselines import baseline_pos_proba, train_baselines
+from qml_oncology.data.breast import load_data
+from qml_oncology.evaluation import (
     compute_metrics,
     cost_sensitive_threshold,
     feature_importance,
@@ -36,9 +36,9 @@ from evaluation import (
     plot_training_curve,
     selective_prediction,
 )
-from quantum_model import QuantumClassifier
+from qml_oncology.quantum.classifier import QuantumClassifier
 
-RESULTS_DIR = Path(__file__).resolve().parent.parent / "results"
+RESULTS_DIR = Path.cwd() / "results"
 
 
 def parse_args():

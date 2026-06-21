@@ -17,11 +17,11 @@ import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader, Dataset
 
-from multimodal import REGIONS, _norm_modality, region_dice
-from unet import get_device
-from unet3d import UNet3D
+from qml_oncology.segmentation.multimodal import REGIONS, _norm_modality, region_dice
+from qml_oncology.segmentation.unet import get_device
+from qml_oncology.segmentation.unet3d import UNet3D
 
-CKPT_DIR = Path(__file__).resolve().parent.parent / "results" / "checkpoints"
+CKPT_DIR = Path.cwd() / "results" / "checkpoints"
 P = 96  # patch size
 
 

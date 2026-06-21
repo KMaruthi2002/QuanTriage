@@ -23,10 +23,10 @@ import numpy as np
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
 
-from datasets import TCGA_FULL_NAMES, load_dataset
-from multiclass_model import MultiClassQuantumClassifier
+from qml_oncology.data.datasets import TCGA_FULL_NAMES, load_dataset
+from qml_oncology.quantum.multiclass import MultiClassQuantumClassifier
 
-RESULTS = Path(__file__).resolve().parent.parent / "results"
+RESULTS = Path.cwd() / "results"
 
 
 def parse_args():

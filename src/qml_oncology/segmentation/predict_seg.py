@@ -16,11 +16,9 @@ import numpy as np
 import torch
 import torch.nn.functional as F
 
-sys.path.insert(0, str(Path(__file__).resolve().parent))
-sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "imaging"))
-from unet import UNet, get_device  # noqa: E402
+from qml_oncology.segmentation.unet import UNet, get_device  # noqa: E402
 
-_ROOT = Path(__file__).resolve().parent.parent
+_ROOT = Path.cwd()
 # prefer the shipped real-MRI-trained model; fall back to a freshly trained one
 CKPT = _ROOT / "models" / "unet_brats.pt"
 if not CKPT.exists():
@@ -64,7 +62,7 @@ def render_predicted_3d(img, pred_mask, spacing, show_organ: bool = True):
     predicted tumor sits inside the organ.
     """
     import plotly.graph_objects as go
-    from tumor3d import _vertex_intensity, brain_context_mesh, tumor_mesh
+    from qml_oncology.imaging.tumor3d import _vertex_intensity, brain_context_mesh, tumor_mesh
 
     data = []
     if show_organ:
@@ -88,7 +86,7 @@ def demo_overlay(out_path):
     import matplotlib
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
-    from seg_data import make_synthetic
+    from qml_oncology.segmentation.seg_data import make_synthetic
 
     _, val = make_synthetic(seed=1)
     model, device, ck = load_model()
@@ -112,6 +110,6 @@ def demo_overlay(out_path):
 
 
 if __name__ == "__main__":
-    out = Path(__file__).resolve().parent.parent / "assets" / "segmentation_demo.png"
+    out = Path.cwd() / "assets" / "segmentation_demo.png"
     dice = demo_overlay(out)
     print(f"val Dice {dice:.3f} -> saved localization panel to {out}")

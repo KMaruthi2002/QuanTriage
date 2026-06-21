@@ -20,9 +20,9 @@ import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader, Dataset
 
-from unet import UNet, get_device
+from qml_oncology.segmentation.unet import UNet, get_device
 
-CKPT_DIR = Path(__file__).resolve().parent.parent / "results" / "checkpoints"
+CKPT_DIR = Path.cwd() / "results" / "checkpoints"
 REGIONS = {"WT": (1, 2, 3), "TC": (2, 3), "ET": (3,)}
 
 

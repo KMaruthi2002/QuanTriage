@@ -91,7 +91,7 @@ classical baselines.
 ```bash
 cd quantum-ml-pennylane
 python3.12 -m venv .venv
-.venv/bin/pip install -r requirements.txt
+.venv/bin/pip install -e ".[all]"     # installs the qml-oncology package + all extras
 ```
 
 > Use **Python 3.12**: PennyLane does not yet ship wheels for 3.14.
@@ -100,23 +100,42 @@ Then pick any entry point, **no cancer is "the default":**
 
 ```bash
 # classify the cancer TYPE: 5 tumor types from real genomics
-.venv/bin/python src/multicancer.py
+.venv/bin/qml-oncology-multicancer
 
 # localize a tumor on real brain MRI (multi-modal U-Net, GPU)
-.venv/bin/python segmentation/multimodal.py --n_volumes 60 --epochs 22
+.venv/bin/python -m qml_oncology.segmentation.multimodal --n_volumes 60 --epochs 22
 
 # bring your OWN data (Kaggle CSV) and train the quantum model live
 .venv/bin/streamlit run studio.py
 
 # compare encodings / hybrid / real-hardware path
-.venv/bin/python src/quantum_advanced.py
+.venv/bin/qml-oncology-quantum-advanced
 
 # the clinically-honest breast-cancer DIAGNOSIS demo (binary)
-.venv/bin/python src/main.py
+.venv/bin/qml-oncology-breast
 
 # explore everything in one interactive app
 .venv/bin/streamlit run app.py
 ```
+
+### Use it as a library (`qml-oncology` on PyPI)
+
+The reusable formulations are published as the [`qml-oncology`](README_PYPI.md) package, so anyone
+can build on the same methods:
+
+```bash
+pip install qml-oncology            # core: quantum classifiers + eval toolkit + datasets
+pip install qml-oncology[imaging]   # + U-Nets, radiomics, 3-D rendering
+pip install qml-oncology[all]       # everything
+```
+
+```python
+from qml_oncology import FlexibleQuantumClassifier, cost_sensitive_threshold, selective_prediction
+clf = FlexibleQuantumClassifier(encoding="reupload", n_qubits=6).fit(X_train, y_train)
+```
+
+Heavy dependencies (PyTorch, qiskit, nibabel, plotly) are optional extras, so the core install
+stays lightweight. See [README_PYPI.md](README_PYPI.md) for the full library API.
 
 ### Interactive dashboard (GUI)
 
@@ -360,25 +379,32 @@ The run prints a full console report and writes artifacts to `results/`:
 
 ## Project layout
 
+An installable `src`-layout package (`pip install qml-oncology`):
+
 ```
-src/
-├── data.py             load breast-cancer data, select top-k NAMED features, scale, split
-├── quantum_model.py    the variational circuit, sklearn-style estimator, + noisy variant
-├── baselines.py        classical logistic regression + RBF SVM on the same features
-├── evaluation.py       metrics, cost threshold, selective prediction, noise, importance, plots
-├── main.py             orchestrates the breast-cancer pipeline and prints the report
-├── datasets.py         registry of real cancer datasets (breast + pan-cancer RNA-seq)
-├── multiclass_model.py multi-class variational quantum classifier (N tumor types)
-└── multicancer.py      train/evaluate across multiple tumor types + classical baseline
-imaging/
-├── tumor3d.py          real MRI + tumor segmentation -> interactive animated 3-D render
-└── quantum_imaging.py  bridge: imaging radiomics -> quantum classifier (+ trainable head)
-segmentation/
-├── unet.py             2-D U-Net for tumor localization (where is it)
-├── seg_data.py         images/masks loader (Kaggle-style) + synthetic generator
-├── train_seg.py        GPU (MPS) training with live epochs + Dice + checkpoints
-└── predict_seg.py      inference, whole-volume segmentation, 3-D render of prediction
-app.py                  Streamlit dashboard (cancer types · 3-D scan · localization · breast dx)
+src/qml_oncology/
+├── __init__.py            core public API (quantum classifiers + eval toolkit + datasets)
+├── quantum/
+│   ├── classifier.py      variational circuit, sklearn-style estimator, + noisy variant
+│   ├── multiclass.py      multi-class quantum classifier (N tumor types)
+│   ├── flexible.py        swappable encodings (angle/amplitude/reupload) + device factory
+│   └── hybrid.py          PyTorch hybrid (classical layers + quantum TorchLayer)
+├── evaluation.py          cost threshold, selective prediction, noise robustness, importance, plots
+├── baselines.py           classical logistic regression + RBF SVM baselines
+├── data/
+│   ├── breast.py          breast-cancer loader (named features, scaling, split)
+│   └── datasets.py        registry of real cancer datasets (breast + pan-cancer RNA-seq)
+├── imaging/
+│   ├── tumor3d.py         real MRI + segmentation -> interactive animated 3-D render
+│   └── bridge.py          imaging radiomics -> quantum circuit (+ trainable head)
+├── segmentation/
+│   ├── unet.py / unet3d.py    2-D and 3-D U-Nets for tumor localization
+│   ├── seg_data.py / msd_data.py / multimodal.py   dataset loaders (Kaggle + MSD MRI)
+│   ├── train_seg.py / train3d.py   GPU (MPS) training with live epochs + Dice
+│   └── predict_seg.py / localize_msd.py   inference + 3-D render of predictions
+└── examples/              runnable demos (also exposed as qml-oncology-* console scripts)
+app.py / studio.py         Streamlit apps (live dashboard + bring-your-own-data training studio)
+pyproject.toml             package metadata + extras (imaging / hardware / app / all)
 ```
 
 **Data note:** scikit-learn encodes the target as malignant=0/benign=1; we relabel so

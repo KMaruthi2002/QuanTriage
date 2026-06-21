@@ -26,7 +26,7 @@ from sklearn.metrics import (
     roc_curve,
 )
 
-from quantum_model import noisy_probabilities
+from qml_oncology.quantum.classifier import noisy_probabilities
 
 
 # --------------------------------------------------------------------------- #

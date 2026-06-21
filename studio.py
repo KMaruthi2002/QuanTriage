@@ -14,7 +14,6 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent
-sys.path.insert(0, str(ROOT / "src"))
 
 import numpy as np
 import pandas as pd
@@ -26,8 +25,8 @@ from sklearn.metrics import accuracy_score, confusion_matrix
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder, StandardScaler
 
-from multiclass_model import MultiClassQuantumClassifier
-from quantum_model import QuantumClassifier
+from qml_oncology.quantum.multiclass import MultiClassQuantumClassifier
+from qml_oncology.quantum.classifier import QuantumClassifier
 
 CKPT_DIR = ROOT / "results" / "checkpoints"
 st.set_page_config(page_title="Quantum Training Studio", page_icon="🔬", layout="wide")
@@ -143,7 +142,7 @@ if st.session_state.get("go"):
             f"- weight L2 norm: `{s['weight_norm']:.3f}`")
 
     if n_classes == 2:
-        from quantum_flexible import FlexibleQuantumClassifier
+        from qml_oncology.quantum.flexible import FlexibleQuantumClassifier
         nq = qubits if encoding == "amplitude" else k  # amplitude: k feats in `qubits` qubits
         model = FlexibleQuantumClassifier(encoding=encoding, n_qubits=nq, n_layers=layers,
                                           reuploads=reuploads, device=device_name, epochs=epochs,

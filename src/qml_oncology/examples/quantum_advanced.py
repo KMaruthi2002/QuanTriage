@@ -21,8 +21,8 @@ from sklearn.metrics import accuracy_score
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 
-from hybrid_torch import HybridQuantumClassifier
-from quantum_flexible import FlexibleQuantumClassifier
+from qml_oncology.quantum.hybrid import HybridQuantumClassifier
+from qml_oncology.quantum.flexible import FlexibleQuantumClassifier
 
 
 def prep(n_features, seed=42):

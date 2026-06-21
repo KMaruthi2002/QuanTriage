@@ -26,8 +26,7 @@ import numpy as np
 import pennylane as qml
 from pennylane import numpy as pnp
 
-sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
-from quantum_model import QuantumClassifier  # noqa: E402
+from qml_oncology.quantum.classifier import QuantumClassifier  # noqa: E402
 
 # the 3-D radiomics features (one per qubit) extracted from a segmentation
 RADIOMICS_KEYS = [

@@ -12,12 +12,10 @@ from pathlib import Path
 
 import numpy as np
 
-ROOT = Path(__file__).resolve().parent.parent
+ROOT = Path.cwd()
 MSD_ROOT = ROOT / "data_cache" / "msd" / "Task01_BrainTumour"
 MM_CKPT = ROOT / "models" / "unet_multimodal_brats.pt"
 
-sys.path.insert(0, str(ROOT / "segmentation"))
-sys.path.insert(0, str(ROOT / "imaging"))
 
 
 def has_msd() -> bool:
@@ -36,8 +34,8 @@ def predict_wt(case_name: str):
     import torch
     from skimage.transform import resize
 
-    from multimodal import _norm_modality
-    from unet import UNet, get_device
+    from qml_oncology.segmentation.multimodal import _norm_modality
+    from qml_oncology.segmentation.unet import UNet, get_device
 
     dev = get_device()
     ck = torch.load(str(MM_CKPT), map_location=dev)
@@ -64,7 +62,7 @@ def predict_wt(case_name: str):
 
 def predicted_figure(case_name: str):
     """Interactive 3-D figure of the predicted tumor on the brain for a case."""
-    from predict_seg import render_predicted_3d
+    from qml_oncology.segmentation.predict_seg import render_predicted_3d
 
     flair, mask, spacing = predict_wt(case_name)
     fig = render_predicted_3d(flair, mask, spacing)

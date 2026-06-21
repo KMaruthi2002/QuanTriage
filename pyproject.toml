@@ -1,0 +1,64 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "qml-oncology"
+version = "0.1.0"
+description = "Quantum machine learning + medical imaging for oncology: clinically-honest classifiers, multi-cancer typing, and tumor localization."
+readme = "README_PYPI.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "Maruthi Kunchala" }]
+keywords = [
+  "quantum machine learning", "pennylane", "oncology", "cancer",
+  "medical imaging", "segmentation", "radiomics", "u-net", "qml",
+]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "License :: OSI Approved :: MIT License",
+  "Intended Audience :: Science/Research",
+  "Topic :: Scientific/Engineering :: Artificial Intelligence",
+  "Topic :: Scientific/Engineering :: Medical Science Apps.",
+  "Topic :: Scientific/Engineering :: Physics",
+]
+dependencies = [
+  "pennylane>=0.38",
+  "scikit-learn>=1.3",
+  "numpy>=1.24",
+  "matplotlib>=3.7",
+  "pandas>=2.0",
+]
+
+[project.optional-dependencies]
+imaging = [
+  "torch>=2.2", "torchvision>=0.17", "scikit-image>=0.22",
+  "nibabel>=5.0", "pynrrd>=1.0", "pillow>=10.0", "plotly>=5.18",
+]
+hardware = ["pennylane-qiskit>=0.36"]
+app = ["streamlit>=1.30", "plotly>=5.18"]
+all = [
+  "torch>=2.2", "torchvision>=0.17", "scikit-image>=0.22", "nibabel>=5.0",
+  "pynrrd>=1.0", "pillow>=10.0", "plotly>=5.18", "pennylane-qiskit>=0.36",
+  "streamlit>=1.30",
+]
+
+[project.urls]
+Homepage = "https://github.com/KMaruthi2002/QuanTriage"
+Repository = "https://github.com/KMaruthi2002/QuanTriage"
+Issues = "https://github.com/KMaruthi2002/QuanTriage/issues"
+
+[project.scripts]
+qml-oncology-multicancer = "qml_oncology.examples.multicancer:main"
+qml-oncology-breast = "qml_oncology.examples.breast_demo:main"
+qml-oncology-quantum-advanced = "qml_oncology.examples.quantum_advanced:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/qml_oncology"]
+
+[tool.hatch.build.targets.sdist]
+include = ["src/qml_oncology", "README_PYPI.md", "LICENSE"]

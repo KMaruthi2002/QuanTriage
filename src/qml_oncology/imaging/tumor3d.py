@@ -20,8 +20,7 @@ from pathlib import Path
 
 import numpy as np
 
-ROOT = Path(__file__).resolve().parent
-SAMPLE_DIR = ROOT / "sample_data"
+SAMPLE_DIR = Path.cwd() / "data_cache" / "brain_sample"
 _BASE = "https://raw.githubusercontent.com/AIM-Harvard/pyradiomics/master/data"
 _FILES = {"image": "brain1_image.nrrd", "label": "brain1_label.nrrd"}
 
@@ -227,7 +226,7 @@ def write_html(path: Path):
 
 
 if __name__ == "__main__":
-    out = ROOT.parent / "results" / "tumor_3d.html"
+    out = Path.cwd() / "results" / "tumor_3d.html"
     feats = write_html(out)
     print("Real tumor radiomics:")
     for k, v in feats.items():

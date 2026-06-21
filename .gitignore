@@ -2,6 +2,10 @@
 __pycache__/
 *.pyc
 results/
-imaging/sample_data/
 data_cache/
 .DS_Store
+# python packaging artifacts
+dist/
+build/
+*.egg-info/
+src/*.egg-info/

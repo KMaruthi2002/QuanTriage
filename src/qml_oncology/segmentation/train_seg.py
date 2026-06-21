@@ -15,10 +15,10 @@ import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader
 
-from seg_data import FolderSegDataset, make_synthetic
-from unet import UNet, get_device
+from qml_oncology.segmentation.seg_data import FolderSegDataset, make_synthetic
+from qml_oncology.segmentation.unet import UNet, get_device
 
-CKPT_DIR = Path(__file__).resolve().parent.parent / "results" / "checkpoints"
+CKPT_DIR = Path.cwd() / "results" / "checkpoints"
 
 
 def dice_score(logits, target, eps=1e-6):
@@ -102,7 +102,7 @@ def main():
     dev = get_device()
     print(f"Device: {dev}  (Apple-Silicon GPU)" if dev.type == "mps" else f"Device: {dev}")
     if args.msd_root:
-        from msd_data import build_msd_slice_dataset
+        from qml_oncology.segmentation.msd_data import build_msd_slice_dataset
 
         print(f"MSD Brain-Tumour: extracting slices from {args.n_volumes} volumes…")
         train_ds, val_ds, info = build_msd_slice_dataset(

@@ -16,7 +16,7 @@ from pathlib import Path
 import numpy as np
 import torch
 
-from seg_data import _TensorSeg
+from qml_oncology.segmentation.seg_data import _TensorSeg
 
 
 def _resize(arr, size, mask=False):

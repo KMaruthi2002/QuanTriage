@@ -15,15 +15,13 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent
-sys.path.insert(0, str(ROOT / "src"))
-sys.path.insert(0, str(ROOT / "imaging"))
 
 import numpy as np
 import streamlit as st
 
-from baselines import baseline_pos_proba, train_baselines
-from data import load_data
-from evaluation import (
+from qml_oncology.baselines import baseline_pos_proba, train_baselines
+from qml_oncology.data.breast import load_data
+from qml_oncology.evaluation import (
     compute_metrics,
     cost_sensitive_threshold,
     feature_importance,
@@ -36,10 +34,10 @@ from evaluation import (
     plot_training_curve,
     selective_prediction,
 )
-from quantum_model import QuantumClassifier
-from quantum_imaging import encode_circuit_drawing, heuristic_risk, radiomics_vector
-from datasets import TCGA_FULL_NAMES, load_dataset
-from multiclass_model import MultiClassQuantumClassifier
+from qml_oncology.quantum.classifier import QuantumClassifier
+from qml_oncology.imaging.bridge import encode_circuit_drawing, heuristic_risk, radiomics_vector
+from qml_oncology.data.datasets import TCGA_FULL_NAMES, load_dataset
+from qml_oncology.quantum.multiclass import MultiClassQuantumClassifier
 
 RESULTS = ROOT / "results"
 RESULTS.mkdir(exist_ok=True)
@@ -88,7 +86,7 @@ def multicancer_train(features, qubits, layers, epochs, weight_power, seed):
 @st.cache_resource(show_spinner="Reconstructing the real tumor in 3-D…")
 def tumor_scan():
     """Build the real-imaging 3-D tumor figure + radiomics (cached)."""
-    from tumor3d import build_figure
+    from qml_oncology.imaging.tumor3d import build_figure
 
     return build_figure(animate=True, show_brain=True)
 
@@ -324,8 +322,7 @@ with tab_scan:
 
     st.divider()
     st.markdown("#### 🎯 U-Net localization, predicted tumor in 3-D")
-    sys.path.insert(0, str(ROOT / "segmentation"))
-    from localize_msd import has_msd, list_cases, predicted_figure
+    from qml_oncology.segmentation.localize_msd import has_msd, list_cases, predicted_figure
 
     if has_msd():
         st.caption("Run the shipped multi-modal U-Net on a real MSD brain-MRI case and render the "
@@ -388,11 +385,10 @@ with tab_types:
 # --------------------------------------------------------------------------- #
 with tab_loc:
     st.subheader("Train a U-Net to localize tumors, live, on your GPU")
-    sys.path.insert(0, str(ROOT / "segmentation"))
     msd_root = ROOT / "data_cache" / "msd" / "Task01_BrainTumour"
     has_msd = msd_root.exists()
 
-    from unet import get_device
+    from qml_oncology.segmentation.unet import get_device
 
     dev = get_device()
     st.caption(f"Compute device: **{dev.type.upper()}**"
@@ -414,13 +410,13 @@ with tab_loc:
     if st.session_state.get("seg_go"):
         with st.spinner("Preparing data…"):
             if source.startswith("MSD"):
-                from msd_data import build_msd_slice_dataset
+                from qml_oncology.segmentation.msd_data import build_msd_slice_dataset
                 train_ds, val_ds, info = build_msd_slice_dataset(
                     str(msd_root), n_volumes=n_vol, seed=42)
                 st.write(f"Real MRI: {info['train_slices']} train / {info['val_slices']} "
                          f"val slices from {info['volumes']} patients")
             else:
-                from seg_data import make_synthetic
+                from qml_oncology.segmentation.seg_data import make_synthetic
                 train_ds, val_ds = make_synthetic()
 
         prog = st.progress(0.0)
@@ -441,7 +437,7 @@ with tab_loc:
                  "train loss": [h["train_loss"] for h in hist]},
                 x="epoch")
 
-        from train_seg import train as train_unet
+        from qml_oncology.segmentation.train_seg import train as train_unet
 
         model, history = train_unet(train_ds, val_ds, epochs=epochs, on_epoch=on_epoch, device=dev)
         best = max(h["val_dice"] for h in history)
@@ -450,7 +446,7 @@ with tab_loc:
 
         # show a few predictions
         import matplotlib.pyplot as _plt
-        from predict_seg import segment_image
+        from qml_oncology.segmentation.predict_seg import segment_image
         st.markdown("#### Predictions (input · ground truth · U-Net)")
         figp, axp = _plt.subplots(2, 3, figsize=(8, 5.5))
         for r in range(2):
