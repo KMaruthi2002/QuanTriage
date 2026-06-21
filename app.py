@@ -37,6 +37,9 @@ from evaluation import (
     selective_prediction,
 )
 from quantum_model import QuantumClassifier
+from quantum_imaging import encode_circuit_drawing, heuristic_risk, radiomics_vector
+from datasets import TCGA_FULL_NAMES, load_dataset
+from multiclass_model import MultiClassQuantumClassifier
 
 RESULTS = ROOT / "results"
 RESULTS.mkdir(exist_ok=True)
@@ -58,6 +61,28 @@ def load_bundle(qubits: int, layers: int, epochs: int, seed: int):
     q_prob = qmodel.predict_proba(data.X_test)[:, 1]
     base_prob = {n: baseline_pos_proba(m, data.X_test) for n, m in baselines.items()}
     return data, qmodel, q_prob, base_prob
+
+
+@st.cache_resource(show_spinner="Training multi-cancer model (downloads ~72 MB on first use)…")
+def multicancer_train(features, qubits, layers, epochs, weight_power, seed):
+    from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
+    from sklearn.linear_model import LogisticRegression
+
+    ds = load_dataset("pan_cancer_rnaseq", n_features=features, seed=seed)
+    qm = MultiClassQuantumClassifier(
+        n_classes=ds.n_classes, n_qubits=max(qubits, ds.n_classes), n_layers=layers,
+        epochs=epochs, seed=seed, verbose=False, weight_power=weight_power,
+    )
+    qm.fit(ds.X_train, ds.y_train)
+    q_pred = qm.predict(ds.X_test)
+    q_acc = accuracy_score(ds.y_test, q_pred)
+    clf = LogisticRegression(max_iter=3000).fit(ds.X_train, ds.y_train)
+    c_acc = accuracy_score(ds.y_test, clf.predict(ds.X_test))
+    report = classification_report(ds.y_test, q_pred, target_names=ds.class_names,
+                                   output_dict=True, zero_division=0)
+    cm = confusion_matrix(ds.y_test, q_pred, labels=range(ds.n_classes))
+    return dict(class_names=ds.class_names, q_acc=q_acc, c_acc=c_acc,
+                report=report, cm=cm, history=qm.history_, features=ds.feature_names)
 
 
 @st.cache_resource(show_spinner="Reconstructing the real tumor in 3-D…")
@@ -123,9 +148,9 @@ st.markdown(
     "not to miss cancer**, **survives quantum noise**, and **explains its reasoning**."
 )
 
-tab_predict, tab_perf, tab_trust, tab_scan = st.tabs(
+tab_predict, tab_perf, tab_trust, tab_scan, tab_types = st.tabs(
     ["🩺 Predict a patient", "📊 Model performance", "🛡️ Trust & robustness",
-     "🧠 3-D tumor scan"]
+     "🧠 3-D tumor scan", "🧬 Cancer types"]
 )
 
 # --------------------------------------------------------------------------- #
@@ -269,9 +294,69 @@ with tab_scan:
     g.metric("Flatness", f"{feats['flatness']:.2f}")
     h.metric("Tumor voxels", f"{feats['voxel_count']:,}")
 
-    st.info(
-        "**Honest scope note.** This is a *real* segmentation rendered in 3-D and quantified with "
-        "real radiomics — not a stylized shape. It is **not** a quantum prediction on this scan: "
-        "the quantum model on the other tabs is a tabular diagnostic. Linking the quantum model to "
-        "imaging (classifying directly from radiomics/voxels) is the project's research roadmap."
+    st.divider()
+    st.markdown("#### 🔗 Quantum analysis of this tumor (imaging → quantum)")
+    st.markdown(
+        "The imaging radiomics above are fed straight into the quantum machinery — the same "
+        "angle-encoding + entangling circuit the classifier uses elsewhere."
     )
+    feats_vec = radiomics_vector(feats)
+    risk = heuristic_risk(feats)
+    rc1, rc2 = st.columns([2, 3])
+    with rc1:
+        st.metric("Radiomics risk indicator", f"{risk['score']:.0%}",
+                  help="Transparent rule-based score — NOT a diagnosis and NOT the quantum model.")
+        st.progress(risk["score"])
+        for name, val in risk["components"].items():
+            st.caption(f"{name}: {val:.0%}")
+    with rc2:
+        st.caption("The tumor's radiomics, angle-encoded into the quantum circuit:")
+        st.code(encode_circuit_drawing(feats_vec), language="text")
+
+    st.warning(
+        "**Honest scope.** The 3-D scan and radiomics are *real*. The risk indicator is a "
+        "transparent heuristic, **not** the quantum model and **not** a diagnosis. The circuit "
+        "shows the real data flow (imaging → quantum), but a *valid* imaging-based quantum "
+        "prediction requires training `QuantumRadiomicsClassifier` on a matched, labeled radiomics "
+        "dataset (the training-studio / Kaggle path). **Not a medical device.**"
+    )
+
+# --------------------------------------------------------------------------- #
+# Tab 5 — multi-cancer types
+# --------------------------------------------------------------------------- #
+with tab_types:
+    st.subheader("Classifying multiple cancer types")
+    st.markdown(
+        "Beyond breast cancer: a **multi-class quantum classifier** on the real **TCGA pan-cancer "
+        "RNA-seq** dataset, classifying a gene-expression profile into one of five tumor types — "
+        "**breast, kidney, lung, prostate, colon**."
+    )
+    if st.button("🧬 Train / load multi-cancer model", help="Downloads ~72 MB on first use; ~1–2 min."):
+        st.session_state["mc_go"] = True
+    if st.session_state.get("mc_go"):
+        res = multicancer_train(10, 10, 4, 35, 0.5, int(seed))
+        m1, m2 = st.columns(2)
+        m1.metric("Quantum accuracy (5-way)", f"{res['q_acc']:.1%}")
+        m2.metric("Classical baseline", f"{res['c_acc']:.1%}")
+        rows = {"tumor type": [], "precision": [], "recall": [], "f1": []}
+        for c in res["class_names"]:
+            r = res["report"][c]
+            rows["tumor type"].append(f"{c} ({TCGA_FULL_NAMES.get(c, c)})")
+            rows["precision"].append(f"{r['precision']:.2f}")
+            rows["recall"].append(f"{r['recall']:.2f}")
+            rows["f1"].append(f"{r['f1-score']:.2f}")
+        st.dataframe(rows, width="stretch", hide_index=True)
+        import numpy as _np
+        cm = _np.array(res["cm"])
+        import plotly.graph_objects as _go
+        heat = _go.Figure(_go.Heatmap(
+            z=cm, x=res["class_names"], y=res["class_names"], colorscale="Blues",
+            text=cm, texttemplate="%{text}", showscale=True))
+        heat.update_layout(title="Confusion matrix (actual ↓ vs predicted →)",
+                           xaxis_title="predicted", yaxis_title="actual", height=420)
+        st.plotly_chart(heat, use_container_width=True)
+        st.caption("Colon (COAD) is the hardest — smallest class, transcriptomically close to the "
+                   "other adenocarcinomas. An honest limitation.")
+    else:
+        st.info("Click the button above to train the 5-type quantum classifier on real "
+                "gene-expression data.")

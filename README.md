@@ -89,7 +89,12 @@ A [Streamlit](https://streamlit.io/) dashboard wraps the model in an interactive
 - **3-D tumor scan** — a *real* brain-MRI volume with a radiologist-drawn tumor segmentation,
   reconstructed as a true 3-D surface (marching cubes), colored by MRI intensity, rotatable and
   animated, with the tumor's "state" quantified by real radiomics (volume, sphericity, elongation,
-  intensity heterogeneity).
+  intensity heterogeneity). This tab also **connects imaging to the quantum model**: the radiomics
+  are angle-encoded into the quantum circuit (shown live), alongside a transparent rule-based risk
+  indicator. A *valid* imaging-based quantum prediction needs training on a labeled radiomics
+  dataset — see [imaging/quantum_imaging.py](imaging/quantum_imaging.py) (`QuantumRadiomicsClassifier`).
+- **Cancer types** — trains the 5-type quantum classifier on the real TCGA pan-cancer data and
+  shows accuracy vs. classical, per-type metrics, and an interactive confusion matrix.
 - The sidebar's *cost-of-a-missed-cancer* and *confidence* sliders update everything live, so you
   can watch the sensitivity-vs-false-alarm tradeoff move in real time. The quantum circuit trains
   once (cached); interactions after that are instant.
