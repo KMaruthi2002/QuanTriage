@@ -8,3 +8,6 @@ pynrrd>=1.0
 torch>=2.2
 torchvision>=0.17
 pillow>=10.0
+pennylane-qiskit>=0.36  # qiskit.aer local sim + IBM Quantum hardware path
+# pennylane-braket      # uncomment for AWS Braket hardware
+

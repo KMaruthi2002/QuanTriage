@@ -333,14 +333,30 @@ measurements, keeping the interpretability step clinically meaningful.
 
 ---
 
-## Extending it
+## Extending it — *implemented*
 
-- **Bigger model:** raise `--qubits` / `--layers` (cost scales with simulator size).
-- **Different encoding:** swap `AngleEmbedding` for `AmplitudeEmbedding` or a *data re-uploading*
-  ansatz for more expressivity.
-- **Real quantum hardware:** PennyLane has plugins for IBM Quantum (`pennylane-qiskit`) and
-  AWS Braket (`pennylane-braket`) — point the device at real backends instead of `default.qubit`.
-- **PyTorch hybrid:** wrap the circuit in `qml.qnn.TorchLayer` to stack it with classical layers.
+All of these are built and runnable, not just suggestions
+([src/quantum_flexible.py](src/quantum_flexible.py), [src/hybrid_torch.py](src/hybrid_torch.py),
+[src/quantum_advanced.py](src/quantum_advanced.py)):
+
+```bash
+.venv/bin/python src/quantum_advanced.py    # runs all four, side by side
+```
+
+| Extension | How | Example result (breast cancer) |
+|---|---|---|
+| **Bigger model** | `FlexibleQuantumClassifier(n_qubits=8, n_layers=6, device="lightning.qubit")` | 0.944 (fast C++ sim) |
+| **Encodings / ansätze** | `encoding="angle" \| "amplitude" \| "reupload"` | angle 0.916 · **re-uploading 0.951** · amplitude 0.629 |
+| **Real quantum hardware** | `model.predict_on_device(X, "qiskit.remote"/"braket.aws.qubit", shots=1024)` | runs on `qiskit.aer` (1024 shots) 0.900 |
+| **PyTorch hybrid** | `HybridQuantumClassifier` — Linear → quantum `TorchLayer` → Linear | **0.972** |
+
+- **Data re-uploading** (re-embed the data between trainable layers, Pérez-Salinas et al. 2020) is
+  more expressive and here beats plain angle encoding.
+- **`make_device`** ([src/quantum_flexible.py](src/quantum_flexible.py)) is the single switch from
+  simulator to real hardware: train on `lightning.qubit`, then `predict_on_device(..., "qiskit.remote",
+  backend="ibm_brisbane", token=...)` for **IBM Quantum**, or `"braket.aws.qubit"` for **AWS Braket**
+  (each needs your own credentials; the code path is identical).
+- The **training studio** ([studio.py](studio.py)) exposes the encoding and device choices in its UI.
 
 ---
 

@@ -90,6 +90,17 @@ epochs = c4.slider("Epochs", 5, 60, 25)
 st.caption(f"Classes: {', '.join(map(str, class_names))}  ·  "
            f"{numeric.shape[1]} numeric features available")
 
+with st.expander("Advanced — encoding / ansatz / backend (binary tasks)"):
+    encoding = st.selectbox("Encoding / ansatz", ["angle", "reupload", "amplitude"],
+                            help="Data re-uploading is more expressive; amplitude packs 2^n "
+                                 "features into n qubits.")
+    device_name = st.selectbox("Quantum device", ["default.qubit", "lightning.qubit"],
+                               help="lightning.qubit is a faster C++ simulator. Swap for "
+                                    "qiskit.remote / braket.aws.qubit to use real hardware.")
+    reuploads = st.slider("Re-upload depth", 1, 4, 2) if encoding == "reupload" else 2
+    if n_classes > 2:
+        st.caption("Advanced options apply to binary tasks; multi-class uses angle encoding.")
+
 
 # --------------------------------------------------------------------------- #
 # 3. Train (live)
@@ -102,7 +113,9 @@ if st.session_state.get("go"):
     # impute any NaNs, select top-k features, scale, split
     X = np.nan_to_num(X, nan=np.nanmean(X) if np.isfinite(np.nanmean(X)) else 0.0)
     Xtr, Xte, ytr, yte = train_test_split(X, y, test_size=0.25, random_state=42, stratify=y)
-    k = min(qubits, X.shape[1])
+    # amplitude encoding packs 2^qubits features into the qubits
+    want = (2 ** qubits) if (n_classes == 2 and encoding == "amplitude") else qubits
+    k = min(want, X.shape[1])
     sel = SelectKBest(f_classif, k=k).fit(Xtr, ytr)
     feat_names = [numeric.columns[i] for i in sel.get_support(indices=True)]
     scaler = StandardScaler().fit(sel.transform(Xtr))
@@ -130,8 +143,11 @@ if st.session_state.get("go"):
             f"- weight L2 norm: `{s['weight_norm']:.3f}`")
 
     if n_classes == 2:
-        model = QuantumClassifier(n_qubits=k, n_layers=layers, epochs=epochs,
-                                  seed=42, verbose=False, on_epoch=on_epoch)
+        from quantum_flexible import FlexibleQuantumClassifier
+        nq = qubits if encoding == "amplitude" else k  # amplitude: k feats in `qubits` qubits
+        model = FlexibleQuantumClassifier(encoding=encoding, n_qubits=nq, n_layers=layers,
+                                          reuploads=reuploads, device=device_name, epochs=epochs,
+                                          seed=42, verbose=False, on_epoch=on_epoch)
     else:
         model = MultiClassQuantumClassifier(n_classes=n_classes, n_qubits=max(k, n_classes),
                                             n_layers=layers, epochs=epochs, seed=42,
