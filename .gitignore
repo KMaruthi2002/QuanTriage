@@ -3,4 +3,5 @@ __pycache__/
 *.pyc
 results/
 imaging/sample_data/
+data_cache/
 .DS_Store

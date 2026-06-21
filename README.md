@@ -145,6 +145,36 @@ Your exact numbers will vary with the flags and seed.
 
 ---
 
+## Beyond breast cancer — multiple tumor types
+
+The pipeline isn't limited to one cancer. A small **dataset registry**
+([src/datasets.py](src/datasets.py)) runs the quantum approach on multiple real datasets, and a
+**multi-class quantum classifier** ([src/multiclass_model.py](src/multiclass_model.py)) classifies
+*which* of several tumor types a sample is:
+
+```bash
+.venv/bin/python src/multicancer.py                      # pan-cancer, 5 tumor types
+.venv/bin/python src/multicancer.py --dataset breast_cancer
+```
+
+On the **TCGA pan-cancer RNA-seq** dataset (801 gene-expression profiles, downloaded on first
+use), it classifies into five real tumor types — **breast (BRCA), kidney (KIRC), lung (LUAD),
+prostate (PRAD), colon (COAD)** — reaching **~89% accuracy** across all five (classical baseline
+~0.99). Two details that mattered:
+
+- **Per-class feature selection** — a global ANOVA F-test starves the smallest class (colon) of
+  marker genes; selecting genes per tumor type (one-vs-rest) is what lets colon be classified at all.
+- **Tempered class weighting** — softens the breast/colon imbalance without collapsing the model.
+
+<p align="center">
+  <img src="assets/multicancer_confusion.png" alt="Multi-cancer confusion matrix" width="520">
+</p>
+
+Colon remains the hardest type (smallest sample, transcriptomically close to the other
+adenocarcinomas) — an honest limitation the confusion matrix makes plain.
+
+---
+
 ## Reading the output
 
 The run prints a full console report and writes artifacts to `results/`:
@@ -165,11 +195,17 @@ The run prints a full console report and writes artifacts to `results/`:
 
 ```
 src/
-├── data.py           load breast-cancer data, select top-k NAMED features, scale, split
-├── quantum_model.py  the variational circuit, sklearn-style estimator, + noisy variant
-├── baselines.py      classical logistic regression + RBF SVM on the same features
-├── evaluation.py     metrics, cost threshold, selective prediction, noise, importance, plots
-└── main.py           orchestrates the pipeline and prints the report
+├── data.py             load breast-cancer data, select top-k NAMED features, scale, split
+├── quantum_model.py    the variational circuit, sklearn-style estimator, + noisy variant
+├── baselines.py        classical logistic regression + RBF SVM on the same features
+├── evaluation.py       metrics, cost threshold, selective prediction, noise, importance, plots
+├── main.py             orchestrates the breast-cancer pipeline and prints the report
+├── datasets.py         registry of real cancer datasets (breast + pan-cancer RNA-seq)
+├── multiclass_model.py multi-class variational quantum classifier (N tumor types)
+└── multicancer.py      train/evaluate across multiple tumor types + classical baseline
+imaging/
+└── tumor3d.py          real MRI + tumor segmentation -> interactive animated 3-D render
+app.py                  Streamlit dashboard (predict · performance · trust · 3-D tumor scan)
 ```
 
 **Data note:** scikit-learn encodes the target as malignant=0/benign=1; we relabel so
