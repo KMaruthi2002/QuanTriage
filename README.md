@@ -1,4 +1,4 @@
-# QuanTriage — A Clinically-Aware Quantum Cancer Triage Classifier
+# QuanTriage — A Clinically-Aware Quantum + Imaging Cancer Platform
 
 ![Python](https://img.shields.io/badge/python-3.12-3776AB?logo=python&logoColor=white)
 ![PennyLane](https://img.shields.io/badge/PennyLane-0.45-2b9e9e)
@@ -10,22 +10,31 @@
   <img src="assets/thumbnail.png" alt="Quantum Cancer Triage" width="520">
 </p>
 
-A hybrid **quantum machine learning** project built with [PennyLane](https://pennylane.ai/).
-It trains a **variational quantum classifier** to distinguish malignant from benign breast
-tumors — and, unlike most QML demos that stop at a single accuracy number, it behaves like a
-tool you'd actually want near a clinic:
+**QuanTriage** is a fully-local platform that combines **quantum machine learning**
+([PennyLane](https://pennylane.ai/)) with **medical imaging** (PyTorch) across *multiple* cancers
+and tasks — not just one dataset:
 
-1. **It knows when it doesn't know.** Low-confidence cases are *referred to a doctor* instead
-   of guessed (selective prediction / abstention).
-2. **It's tuned to not miss cancer.** The decision threshold is chosen so that missing a
-   malignancy is treated as far costlier than a false alarm (cost-sensitive thresholding).
-3. **It's stress-tested on noisy "hardware."** The trained model is re-evaluated on a noisy
-   quantum simulator that mimics real-device decoherence.
-4. **It explains itself.** Permutation importance shows which cell-nucleus measurements drive
-   the predictions.
+- **Diagnose** — a variational quantum classifier flags malignant vs. benign **breast** tumors.
+- **Classify the type** — a multi-class quantum model identifies which of **five cancers** (breast,
+  kidney, lung, prostate, colon) a gene-expression profile belongs to.
+- **Localize** — a U-Net finds *where* a tumor is in real **brain MRI** and renders it in 3-D on the
+  organ, down to clinical sub-regions.
+- **Bring your own data** — a training studio trains the quantum model on any CSV you load (Kaggle, etc.).
 
-Everything runs on a **simulator** — no quantum hardware required — and a full run finishes in
-about **30 seconds** on a laptop.
+Everything runs **locally and GPU-accelerated** (Apple-Silicon MPS); the quantum circuits run on
+simulators or **real hardware** (IBM Quantum / AWS Braket). The whole system is mapped in the
+[architecture](#architecture--how-it-all-fits-together) below.
+
+And unlike most QML demos that stop at a single accuracy number, the classifiers are built to be
+**clinically honest**:
+
+1. **They know when they don't know.** Low-confidence cases are *referred to a doctor* instead of
+   guessed (selective prediction / abstention).
+2. **Tuned not to miss cancer.** The decision threshold treats a missed malignancy as far costlier
+   than a false alarm (cost-sensitive thresholding).
+3. **Stress-tested under quantum noise.** Models are re-evaluated on a noisy simulator that mimics
+   real-device decoherence.
+4. **They explain themselves.** Permutation importance shows which inputs drive each prediction.
 
 ---
 
