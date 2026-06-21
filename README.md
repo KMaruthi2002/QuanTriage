@@ -1,5 +1,15 @@
 # QuanTriage — A Clinically-Aware Quantum Cancer Triage Classifier
 
+![Python](https://img.shields.io/badge/python-3.12-3776AB?logo=python&logoColor=white)
+![PennyLane](https://img.shields.io/badge/PennyLane-0.45-2b9e9e)
+![scikit-learn](https://img.shields.io/badge/scikit--learn-F7931E?logo=scikit-learn&logoColor=white)
+![Streamlit](https://img.shields.io/badge/Streamlit-app-FF4B4B?logo=streamlit&logoColor=white)
+![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)
+
+<p align="center">
+  <img src="assets/thumbnail.png" alt="Quantum Cancer Triage" width="520">
+</p>
+
 A hybrid **quantum machine learning** project built with [PennyLane](https://pennylane.ai/).
 It trains a **variational quantum classifier** to distinguish malignant from benign breast
 tumors — and, unlike most QML demos that stop at a single accuracy number, it behaves like a
