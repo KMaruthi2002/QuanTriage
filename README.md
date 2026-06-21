@@ -180,6 +180,41 @@ adenocarcinomas) — an honest limitation the confusion matrix makes plain.
 
 ---
 
+## Tumor localization — *where* is the cancer (U-Net, GPU-accelerated)
+
+Classification says *what*; localization says *where*. A **2-D U-Net**
+([segmentation/unet.py](segmentation/unet.py)) is trained to produce a per-pixel tumor mask, then
+predicted masks flow into the 3-D renderer. It trains on the GPU via PyTorch's **Metal (MPS)
+backend on Apple Silicon** — on an M5 a synthetic pipeline check hits **Dice 0.998 in ~16 s**.
+
+```bash
+# validate the pipeline on synthetic data (no download needed)
+python segmentation/train_seg.py --epochs 25
+python segmentation/predict_seg.py          # writes assets/segmentation_demo.png
+
+# train on a real dataset (your own / Kaggle), images + masks folders:
+python segmentation/train_seg.py --images_dir path/to/images --masks_dir path/to/masks --epochs 40
+```
+
+<p align="center">
+  <img src="assets/segmentation_demo.png" alt="U-Net tumor localization" width="380">
+</p>
+
+- [segmentation/seg_data.py](segmentation/seg_data.py) — flexible `images/ + masks/` loader (the
+  common Kaggle layout) plus a synthetic generator for pipeline validation.
+- [segmentation/train_seg.py](segmentation/train_seg.py) — MPS-accelerated training with **live
+  per-epoch loss + Dice** and best-checkpoint saving.
+- [segmentation/predict_seg.py](segmentation/predict_seg.py) — inference, whole-volume
+  segmentation, and a 3-D render of the **predicted** tumor.
+
+> **Honest status.** The architecture and GPU training are real; the **Dice 0.998 is on synthetic
+> blobs**, which only proves the pipeline works. A real, generalizable brain-tumor localizer
+> requires training on a real labeled dataset (e.g. Medical Segmentation Decathlon or a Kaggle
+> MRI-segmentation set) — that is the next step, and the loaders are ready for it. **Not a medical
+> device.**
+
+---
+
 ## Reading the output
 
 The run prints a full console report and writes artifacts to `results/`:
@@ -209,8 +244,14 @@ src/
 ├── multiclass_model.py multi-class variational quantum classifier (N tumor types)
 └── multicancer.py      train/evaluate across multiple tumor types + classical baseline
 imaging/
-└── tumor3d.py          real MRI + tumor segmentation -> interactive animated 3-D render
-app.py                  Streamlit dashboard (predict · performance · trust · 3-D tumor scan)
+├── tumor3d.py          real MRI + tumor segmentation -> interactive animated 3-D render
+└── quantum_imaging.py  bridge: imaging radiomics -> quantum classifier (+ trainable head)
+segmentation/
+├── unet.py             2-D U-Net for tumor localization (where is it)
+├── seg_data.py         images/masks loader (Kaggle-style) + synthetic generator
+├── train_seg.py        GPU (MPS) training with live epochs + Dice + checkpoints
+└── predict_seg.py      inference, whole-volume segmentation, 3-D render of prediction
+app.py                  Streamlit dashboard (predict · performance · trust · 3-D scan · types)
 ```
 
 **Data note:** scikit-learn encodes the target as malignant=0/benign=1; we relabel so

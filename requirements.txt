@@ -5,3 +5,6 @@ streamlit>=1.30
 plotly>=5.18
 scikit-image>=0.22
 pynrrd>=1.0
+torch>=2.2
+torchvision>=0.17
+pillow>=10.0
