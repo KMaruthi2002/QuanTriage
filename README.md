@@ -180,6 +180,23 @@ adenocarcinomas) — an honest limitation the confusion matrix makes plain.
 
 ---
 
+## Live training studio — train on your own (Kaggle) data
+
+A dedicated app ([studio.py](studio.py)) to **bring your own CSV and train the quantum classifier
+live**:
+
+```bash
+.venv/bin/streamlit run studio.py
+```
+
+Upload a dataset (e.g. from Kaggle), pick the target column, and watch **every epoch** — loss and
+accuracy curves, the **live state of the model** (weight norm, per-layer stats, the circuit) — then
+see test metrics, a confusion matrix, and **download a checkpoint**. Binary vs. multi-class is
+auto-detected. The same `on_epoch` hook and `save_checkpoint`/`load_checkpoint` live on the
+quantum estimators in [src/quantum_model.py](src/quantum_model.py).
+
+---
+
 ## Tumor localization — *where* is the cancer (U-Net, GPU-accelerated)
 
 Classification says *what*; localization says *where*. A **2-D U-Net**
@@ -206,7 +223,11 @@ hit train, and watch loss + Dice update per epoch on the GPU, then see predicted
 
 <p align="center">
   <img src="assets/segmentation_demo.png" alt="U-Net tumor localization" width="380">
+  <img src="assets/tumor_on_organ.png" alt="Tumor localized on the organ" width="360">
 </p>
+
+Predicted masks render **on the organ** (translucent brain + the located tumor), so you see
+*where* the tumor sits — interactive and rotatable in the app.
 
 - [segmentation/seg_data.py](segmentation/seg_data.py) — flexible `images/ + masks/` loader (the
   common Kaggle layout) plus a synthetic generator for pipeline validation.

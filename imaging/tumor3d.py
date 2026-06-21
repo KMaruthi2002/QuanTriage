@@ -111,6 +111,30 @@ def _vertex_intensity(img, verts, spacing):
     return img[idx[:, 0], idx[:, 1], idx[:, 2]]
 
 
+def brain_context_mesh(img, spacing, opacity: float = 0.12):
+    """A translucent organ (brain) surface for context, downsampled to stay light.
+
+    Returns a Plotly Mesh3d (or None if it can't be built), so a tumor can be
+    shown sitting *on the organ* rather than floating in space.
+    """
+    import plotly.graph_objects as go
+    from skimage import measure
+
+    ds = img[::2, ::2, :]
+    sp_ds = spacing * np.array([2, 2, 1])
+    thr = float(np.percentile(img[img > 0], 55))
+    try:
+        bv, bf, _, _ = measure.marching_cubes(ds, level=thr, spacing=tuple(sp_ds))
+    except (ValueError, RuntimeError):
+        return None
+    return go.Mesh3d(
+        x=bv[:, 0], y=bv[:, 1], z=bv[:, 2],
+        i=bf[:, 0], j=bf[:, 1], k=bf[:, 2],
+        color="lightgray", opacity=opacity, hoverinfo="skip",
+        name="organ", showscale=False,
+    )
+
+
 def build_figure(animate: bool = True, show_brain: bool = True):
     """Interactive, animated Plotly figure of the real tumor (+ brain context)."""
     import plotly.graph_objects as go
@@ -125,21 +149,9 @@ def build_figure(animate: bool = True, show_brain: bool = True):
 
     # translucent brain context (downsampled so it stays light)
     if show_brain:
-        ds = img[::2, ::2, :]
-        sp_ds = spacing * np.array([2, 2, 1])
-        thr = float(np.percentile(img[img > 0], 55))
-        try:
-            bv, bf, _, _ = measure.marching_cubes(ds, level=thr, spacing=tuple(sp_ds))
-            data.append(
-                go.Mesh3d(
-                    x=bv[:, 0], y=bv[:, 1], z=bv[:, 2],
-                    i=bf[:, 0], j=bf[:, 1], k=bf[:, 2],
-                    color="lightgray", opacity=0.12, hoverinfo="skip",
-                    name="brain", showscale=False,
-                )
-            )
-        except (ValueError, RuntimeError):
-            pass
+        ctx = brain_context_mesh(img, spacing)
+        if ctx is not None:
+            data.append(ctx)
 
     # the tumor itself, surface-colored by MRI intensity
     data.append(

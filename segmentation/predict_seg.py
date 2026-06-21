@@ -52,18 +52,29 @@ def segment_volume(model, volume: np.ndarray, device, axis: int = 2, thr: float 
     return np.moveaxis((out > thr).astype(np.uint8), 0, axis)
 
 
-def render_predicted_3d(img, pred_mask, spacing):
-    """Build a 3-D Plotly figure of the predicted tumor (reuses imaging code)."""
-    import plotly.graph_objects as go
-    from tumor3d import _vertex_intensity, tumor_mesh
+def render_predicted_3d(img, pred_mask, spacing, show_organ: bool = True):
+    """Build a 3-D Plotly figure of the predicted tumor ON the organ.
 
+    Reuses the imaging renderer: a translucent organ surface for context plus the
+    predicted tumor mesh, colored by MRI intensity — so you see *where* the
+    predicted tumor sits inside the organ.
+    """
+    import plotly.graph_objects as go
+    from tumor3d import _vertex_intensity, brain_context_mesh, tumor_mesh
+
+    data = []
+    if show_organ:
+        ctx = brain_context_mesh(img, spacing)
+        if ctx is not None:
+            data.append(ctx)
     verts, faces = tumor_mesh(pred_mask, spacing)
     vcol = _vertex_intensity(img, verts, spacing)
-    fig = go.Figure(go.Mesh3d(
+    data.append(go.Mesh3d(
         x=verts[:, 0], y=verts[:, 1], z=verts[:, 2],
         i=faces[:, 0], j=faces[:, 1], k=faces[:, 2],
-        intensity=vcol, colorscale="Hot", showscale=True))
-    fig.update_layout(title="Predicted tumor (U-Net)", height=600,
+        intensity=vcol, colorscale="Hot", showscale=True, name="predicted tumor"))
+    fig = go.Figure(data=data)
+    fig.update_layout(title="Predicted tumor on the organ (U-Net)", height=600,
                       scene=dict(aspectmode="data"), margin=dict(l=0, r=0, t=40, b=0))
     return fig
 
