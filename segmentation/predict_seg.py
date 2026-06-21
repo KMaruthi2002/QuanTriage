@@ -20,7 +20,11 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "imaging"))
 from unet import UNet, get_device  # noqa: E402
 
-CKPT = Path(__file__).resolve().parent.parent / "results" / "checkpoints" / "unet_best.pt"
+_ROOT = Path(__file__).resolve().parent.parent
+# prefer the shipped real-MRI-trained model; fall back to a freshly trained one
+CKPT = _ROOT / "models" / "unet_brats.pt"
+if not CKPT.exists():
+    CKPT = _ROOT / "results" / "checkpoints" / "unet_best.pt"
 
 
 def load_model(ckpt_path=CKPT, device=None):
