@@ -1,6 +1,6 @@
 """Bridge: connect the variational quantum classifier to the 3-D imaging module.
 
-The breast-cancer quantum classifier already runs on *image-derived* features —
+The breast-cancer quantum classifier already runs on *image-derived* features -
 the Wisconsin "radius / texture / perimeter / concavity…" values are radiomics
 computed from cell-nucleus images. This module extracts the 3-D analogues from a
 real tumor segmentation and feeds them into the SAME quantum machinery, so the
@@ -10,11 +10,11 @@ imaging pipeline and the quantum model are literally wired together:
 
 Two honest caveats baked in:
   * A *validated* imaging-based prediction needs a quantum model trained on a
-    matched, labeled radiomics dataset (e.g. a Kaggle/TCIA set) — that is what
+    matched, labeled radiomics dataset (e.g. a Kaggle/TCIA set), that is what
     ``QuantumRadiomicsClassifier`` is for. Plug your data into it to train.
   * Without that, we do NOT fake a diagnosis. We show (a) the real radiomics,
     (b) a transparent rule-based risk indicator, and (c) the actual quantum
-    circuit those features feed — i.e. the connection, not a clinical claim.
+    circuit those features feed, i.e. the connection, not a clinical claim.
 """
 
 from __future__ import annotations
@@ -44,7 +44,7 @@ def radiomics_vector(feats: dict) -> np.ndarray:
 def heuristic_risk(feats: dict) -> dict:
     """A transparent, rule-based concern indicator from radiomics.
 
-    NOT a diagnosis and NOT the quantum model — just an interpretable score from
+    NOT a diagnosis and NOT the quantum model, just an interpretable score from
     well-known radiomics cues, so there is an honest readout to show.
     Irregular shape (low sphericity), heterogeneous texture, and large size all
     raise the indicator.
@@ -65,7 +65,7 @@ def encode_circuit_drawing(vector: np.ndarray, n_layers: int = 2, seed: int = 0)
 
     This demonstrates the literal data flow (imaging features -> angle encoding ->
     entangling layers -> measurement). Weights are random here, so the numeric
-    output is NOT meaningful — only the connection/structure is.
+    output is NOT meaningful, only the connection/structure is.
     """
     n = len(vector)
     dev = qml.device("default.qubit", wires=n)
@@ -91,7 +91,7 @@ class QuantumRadiomicsClassifier:
     Point ``fit`` at a labeled radiomics table (e.g. exported from a Kaggle
     dataset or produced by segmenting many cases) and it trains the same
     variational quantum classifier used elsewhere in the project. This is the
-    real path to an imaging-based quantum diagnostic — it just needs data.
+    real path to an imaging-based quantum diagnostic, it just needs data.
     """
 
     def __init__(self, n_layers: int = 4, epochs: int = 40, seed: int = 42):

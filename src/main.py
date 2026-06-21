@@ -1,4 +1,4 @@
-"""QuanTriage — a clinically-aware quantum cancer triage classifier.
+"""QuanTriage, a clinically-aware quantum cancer triage classifier.
 
 Runs the full pipeline:
   1. load + preprocess the breast-cancer data
@@ -95,7 +95,7 @@ def main():
     threshold = cost_sensitive_threshold(data.y_test, q_prob, cost_ratio=args.cost_ratio)
     print(f"Chosen threshold (cost ratio FN:FP = {args.cost_ratio:.0f}:1): {threshold:.3f}")
 
-    hr("5. METRICS — QUANTUM vs CLASSICAL")
+    hr("5. METRICS, QUANTUM vs CLASSICAL")
     q_metrics_default = compute_metrics(data.y_test, q_prob, 0.5)
     q_metrics_tuned = compute_metrics(data.y_test, q_prob, threshold)
     rows = {

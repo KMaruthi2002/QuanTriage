@@ -66,7 +66,7 @@ class QuantumClassifier(BaseEstimator, ClassifierMixin):
         self.batch_size = batch_size
         self.seed = seed
         self.verbose = verbose
-        # optional callback(stats: dict) after each epoch — powers the live studio
+        # optional callback(stats: dict) after each epoch, powers the live studio
         self.on_epoch = on_epoch
 
     # -- internal helpers ---------------------------------------------------

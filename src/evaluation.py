@@ -222,7 +222,7 @@ def plot_roc(y_true, curves: dict, path: Path):
     ax.plot([0, 1], [0, 1], "k--", alpha=0.4)
     ax.set_xlabel("False positive rate")
     ax.set_ylabel("True positive rate (sensitivity)")
-    ax.set_title("ROC — quantum vs. classical")
+    ax.set_title("ROC, quantum vs. classical")
     ax.legend(loc="lower right")
     fig.tight_layout()
     fig.savefig(path, dpi=120)
@@ -255,7 +255,7 @@ def plot_selective(sel: dict, path: Path):
     ax.plot(cov, acc, marker="o", ms=3, color="#27ae60")
     ax.set_xlabel("coverage (fraction the model decides)")
     ax.set_ylabel("accuracy on accepted cases")
-    ax.set_title("Selective prediction — accuracy rises as it abstains more")
+    ax.set_title("Selective prediction, accuracy rises as it abstains more")
     ax.invert_xaxis()  # left = decide everything, right = abstain more
     fig.tight_layout()
     fig.savefig(path, dpi=120)

@@ -1,5 +1,5 @@
 """Run the shipped multi-modal U-Net on a real MSD volume and return a 3-D
-predicted-tumor render — used to wire localization into the app's 3-D tab.
+predicted-tumor render, used to wire localization into the app's 3-D tab.
 
 Gracefully no-ops if the MSD data isn't present locally (it's a 7 GB download,
 not shipped in the repo); the app then falls back to the shipped static images.

@@ -1,4 +1,4 @@
-"""Train the U-Net tumor-localization model — GPU-accelerated on Apple Silicon.
+"""Train the U-Net tumor-localization model, GPU-accelerated on Apple Silicon.
 
 Live per-epoch logging (train loss, val loss, val Dice), best-checkpoint saving.
 
@@ -116,7 +116,7 @@ def main():
         val_ds = torch.utils.data.Subset(full, range(cut, len(full)))
         print(f"Real dataset: {len(full)} image/mask pairs")
     else:
-        print("No dataset given — using SYNTHETIC data to validate the pipeline.")
+        print("No dataset given, using SYNTHETIC data to validate the pipeline.")
         train_ds, val_ds = make_synthetic(size=args.size)
 
     _, history = train(train_ds, val_ds, epochs=args.epochs,

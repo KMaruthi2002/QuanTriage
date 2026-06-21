@@ -1,10 +1,10 @@
 """Datasets for tumor segmentation.
 
 Two sources:
-  * ``FolderSegDataset`` — point it at an images/ + masks/ layout (the common
+  * ``FolderSegDataset``, point it at an images/ + masks/ layout (the common
     Kaggle format) and it loads grayscale image/mask pairs. This is how your own
     Kaggle data plugs in.
-  * ``make_synthetic`` — generates synthetic "scans" with bright blob "tumors"
+  * ``make_synthetic``, generates synthetic "scans" with bright blob "tumors"
     and ground-truth masks, purely to validate that the U-Net + MPS training
     pipeline works end-to-end before real medical data is wired in. Clearly NOT
     medical data.
@@ -61,7 +61,7 @@ class _TensorSeg(Dataset):
 def make_synthetic(n: int = 240, size: int = 128, seed: int = 0):
     """Synthetic scans: textured background + bright elliptical 'tumor' blobs.
 
-    Returns (train_ds, val_ds). For PIPELINE VALIDATION ONLY — not medical data.
+    Returns (train_ds, val_ds). For PIPELINE VALIDATION ONLY, not medical data.
     """
     rng = np.random.default_rng(seed)
     yy, xx = np.mgrid[0:size, 0:size]

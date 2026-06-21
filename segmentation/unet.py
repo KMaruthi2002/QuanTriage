@@ -3,7 +3,7 @@
 U-Net is the standard architecture for biomedical segmentation: an encoder that
 downsamples to capture context, a decoder that upsamples to recover resolution,
 and skip connections that preserve fine detail. The output is a per-pixel map of
-"is this pixel tumor?" — i.e. *where* the cancer is.
+"is this pixel tumor?", i.e. *where* the cancer is.
 """
 
 from __future__ import annotations

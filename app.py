@@ -1,4 +1,4 @@
-"""QuanTriage — interactive Streamlit dashboard for the quantum cancer classifier.
+"""QuanTriage, interactive Streamlit dashboard for the quantum cancer classifier.
 
 Run with:
     .venv/bin/streamlit run app.py
@@ -109,7 +109,7 @@ def static_artifacts(qubits: int, layers: int, epochs: int, seed: int):
 
 
 # --------------------------------------------------------------------------- #
-# Sidebar — controls
+# Sidebar, controls
 # --------------------------------------------------------------------------- #
 st.sidebar.title("🩺 QuanTriage")
 st.sidebar.caption("A clinically-aware **quantum** cancer triage classifier (PennyLane).")
@@ -130,7 +130,7 @@ with st.sidebar.expander("Model (changing retrains, ~30s)"):
     epochs = st.slider("Training epochs", 10, 80, 40, 5)
     seed = st.number_input("Random seed", value=42, step=1)
 
-st.sidebar.info("Educational research demo — **not a medical device.**")
+st.sidebar.info("Educational research demo, **not a medical device.**")
 
 # --------------------------------------------------------------------------- #
 # Load everything (cached)
@@ -145,7 +145,7 @@ st.title("QuanTriage")
 st.markdown(
     "A local **quantum + imaging** platform for cancer ML: classify the **cancer type** across "
     "five tumor types, **localize** tumors in real brain MRI with a 3-D render, and train on your "
-    "own data — plus a clinically-honest **breast-cancer diagnosis** demo that defers to a doctor "
+    "own data, plus a clinically-honest **breast-cancer diagnosis** demo that defers to a doctor "
     "when unsure. Everything runs on-device."
 )
 
@@ -155,7 +155,7 @@ tab_types, tab_scan, tab_loc, tab_predict, tab_perf, tab_trust = st.tabs(
 )
 
 # --------------------------------------------------------------------------- #
-# Tab 1 — single-patient prediction
+# Tab 1, single-patient prediction
 # --------------------------------------------------------------------------- #
 with tab_predict:
     st.subheader("Enter a patient's measurements")
@@ -199,9 +199,9 @@ with tab_predict:
         st.metric("Model confidence", f"{confidence:.1%}")
 
         if confidence < confidence_cut:
-            st.warning("⚠️ **Refer to a doctor** — the model is not confident enough to decide.")
+            st.warning("⚠️ **Refer to a doctor**, the model is not confident enough to decide.")
         elif p_mal >= threshold:
-            st.error("🔴 **Flag as malignant** — recommend clinical follow-up.")
+            st.error("🔴 **Flag as malignant**, recommend clinical follow-up.")
         else:
             st.success("🟢 **Likely benign.**")
         st.caption(
@@ -210,7 +210,7 @@ with tab_predict:
         )
 
 # --------------------------------------------------------------------------- #
-# Tab 2 — performance vs. classical
+# Tab 2, performance vs. classical
 # --------------------------------------------------------------------------- #
 with tab_perf:
     st.subheader("Quantum vs. classical baselines (held-out test set)")
@@ -241,14 +241,14 @@ with tab_perf:
     g1, g2 = st.columns(2)
     plot_confusion(cm, RESULTS / "confusion_live.png")
     g1.image(str(RESULTS / "confusion_live.png"), caption="Quantum confusion @ cost-tuned threshold")
-    g2.image(str(RESULTS / "roc_curve.png"), caption="ROC — quantum vs. classical")
+    g2.image(str(RESULTS / "roc_curve.png"), caption="ROC, quantum vs. classical")
     st.image(str(RESULTS / "training_curve.png"), caption="Quantum training curve")
 
 # --------------------------------------------------------------------------- #
-# Tab 3 — trust & robustness
+# Tab 3, trust & robustness
 # --------------------------------------------------------------------------- #
 with tab_trust:
-    st.subheader("Selective prediction — knowing when to defer")
+    st.subheader("Selective prediction, knowing when to defer")
     sel = selective_prediction(data.y_test, q_prob, confidence=confidence_cut)
     s1, s2, s3 = st.columns(3)
     s1.metric("Cases decided (coverage)", f"{sel['coverage']:.0%}")
@@ -271,7 +271,7 @@ with tab_trust:
     c2.caption("Permutation importance over real cell-nucleus measurements.")
 
 # --------------------------------------------------------------------------- #
-# Tab 4 — real 3-D tumor scan
+# Tab 4, real 3-D tumor scan
 # --------------------------------------------------------------------------- #
 with tab_scan:
     st.subheader("Real tumor, reconstructed in 3-D")
@@ -283,7 +283,7 @@ with tab_scan:
     fig, feats = tumor_scan()
     st.plotly_chart(fig, use_container_width=True)
 
-    st.markdown("#### Tumor state — quantified from the real segmentation (radiomics)")
+    st.markdown("#### Tumor state, quantified from the real segmentation (radiomics)")
     a, b, c, d = st.columns(4)
     a.metric("Volume", f"{feats['tumor_volume_mm3']:.0f} mm³")
     b.metric("Max diameter", f"{feats['max_diameter_mm']:.0f} mm")
@@ -298,7 +298,7 @@ with tab_scan:
     st.divider()
     st.markdown("#### 🔗 Quantum analysis of this tumor (imaging → quantum)")
     st.markdown(
-        "The imaging radiomics above are fed straight into the quantum machinery — the same "
+        "The imaging radiomics above are fed straight into the quantum machinery, the same "
         "angle-encoding + entangling circuit the classifier uses elsewhere."
     )
     feats_vec = radiomics_vector(feats)
@@ -306,7 +306,7 @@ with tab_scan:
     rc1, rc2 = st.columns([2, 3])
     with rc1:
         st.metric("Radiomics risk indicator", f"{risk['score']:.0%}",
-                  help="Transparent rule-based score — NOT a diagnosis and NOT the quantum model.")
+                  help="Transparent rule-based score, NOT a diagnosis and NOT the quantum model.")
         st.progress(risk["score"])
         for name, val in risk["components"].items():
             st.caption(f"{name}: {val:.0%}")
@@ -323,7 +323,7 @@ with tab_scan:
     )
 
     st.divider()
-    st.markdown("#### 🎯 U-Net localization — predicted tumor in 3-D")
+    st.markdown("#### 🎯 U-Net localization, predicted tumor in 3-D")
     sys.path.insert(0, str(ROOT / "segmentation"))
     from localize_msd import has_msd, list_cases, predicted_figure
 
@@ -338,19 +338,19 @@ with tab_scan:
             st.caption(f"Predicted tumor volume ≈ {meta['tumor_volume_mm3']:,.0f} mm³ "
                        f"({meta['tumor_voxels']:,} voxels) · case {meta['case']}")
     else:
-        st.caption("MSD data not present locally (7 GB, not shipped) — showing the shipped result. "
+        st.caption("MSD data not present locally (7 GB, not shipped), showing the shipped result. "
                    "Run `python segmentation/multimodal.py` after downloading MSD to do this live.")
         st.image(str(ROOT / "assets" / "msd_tumor_on_organ.png"),
                  caption="Predicted tumor on the brain (held-out MRI, Dice 0.85)")
 
 # --------------------------------------------------------------------------- #
-# Tab 5 — multi-cancer types
+# Tab 5, multi-cancer types
 # --------------------------------------------------------------------------- #
 with tab_types:
     st.subheader("Classifying multiple cancer types")
     st.markdown(
         "Beyond breast cancer: a **multi-class quantum classifier** on the real **TCGA pan-cancer "
-        "RNA-seq** dataset, classifying a gene-expression profile into one of five tumor types — "
+        "RNA-seq** dataset, classifying a gene-expression profile into one of five tumor types, "
         "**breast, kidney, lung, prostate, colon**."
     )
     if st.button("🧬 Train / load multi-cancer model", help="Downloads ~72 MB on first use; ~1–2 min."):
@@ -377,17 +377,17 @@ with tab_types:
         heat.update_layout(title="Confusion matrix (actual ↓ vs predicted →)",
                            xaxis_title="predicted", yaxis_title="actual", height=420)
         st.plotly_chart(heat, use_container_width=True)
-        st.caption("Colon (COAD) is the hardest — smallest class, transcriptomically close to the "
+        st.caption("Colon (COAD) is the hardest, smallest class, transcriptomically close to the "
                    "other adenocarcinomas. An honest limitation.")
     else:
         st.info("Click the button above to train the 5-type quantum classifier on real "
                 "gene-expression data.")
 
 # --------------------------------------------------------------------------- #
-# Tab 6 — tumor localization (live U-Net training on the GPU)
+# Tab 6, tumor localization (live U-Net training on the GPU)
 # --------------------------------------------------------------------------- #
 with tab_loc:
-    st.subheader("Train a U-Net to localize tumors — live, on your GPU")
+    st.subheader("Train a U-Net to localize tumors, live, on your GPU")
     sys.path.insert(0, str(ROOT / "segmentation"))
     msd_root = ROOT / "data_cache" / "msd" / "Task01_BrainTumour"
     has_msd = msd_root.exists()
@@ -402,7 +402,7 @@ with tab_loc:
     if has_msd:
         sources.insert(0, "MSD Brain-Tumour (real MRI)")
     else:
-        st.info("MSD Brain-Tumour data not found yet — synthetic only until the download finishes.")
+        st.info("MSD Brain-Tumour data not found yet, synthetic only until the download finishes.")
     source = st.radio("Training data", sources, horizontal=True)
     c1, c2 = st.columns(2)
     epochs = c1.slider("Epochs", 5, 40, 15)
@@ -445,7 +445,7 @@ with tab_loc:
 
         model, history = train_unet(train_ds, val_ds, epochs=epochs, on_epoch=on_epoch, device=dev)
         best = max(h["val_dice"] for h in history)
-        st.success(f"Training complete — best validation Dice **{best:.3f}**. "
+        st.success(f"Training complete, best validation Dice **{best:.3f}**. "
                    f"Checkpoint saved to results/checkpoints/.")
 
         # show a few predictions
@@ -463,5 +463,5 @@ with tab_loc:
         figp.tight_layout()
         st.pyplot(figp)
 
-    st.warning("Educational/research prototype — **not a medical device.** Synthetic Dice only "
+    st.warning("Educational/research prototype, **not a medical device.** Synthetic Dice only "
                "validates the pipeline; real accuracy comes from training on real MRI.")

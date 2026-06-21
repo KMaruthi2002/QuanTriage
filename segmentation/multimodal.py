@@ -2,8 +2,8 @@
 
 Upgrades the FLAIR-only / binary localizer to the real clinical setting:
 
-  * **4 input modalities** — FLAIR, T1, T1ce (t1gd), T2 — stacked as channels.
-  * **4 output classes** — background, edema, non-enhancing, enhancing tumor.
+  * **4 input modalities**, FLAIR, T1, T1ce (t1gd), T2, stacked as channels.
+  * **4 output classes**, background, edema, non-enhancing, enhancing tumor.
 
 Reported with the standard BraTS regions computed from the predicted class map:
   * WT (whole tumor)  = {edema, non-enh, enh}      labels {1,2,3}

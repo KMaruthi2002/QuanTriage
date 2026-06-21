@@ -13,7 +13,7 @@ A clinically-aware quantum classifier: triage that knows when to defer
     tutorial_data_reuploading_classifier Data-reuploading classifier
     tutorial_noisy_circuits Noisy circuits
 
-*Author: Maruthi Kunchala — Posted: 21 June 2026.*
+*Author: Maruthi Kunchala, Posted: 21 June 2026.*
 
 Most quantum machine learning tutorials stop at *"encode the data, run a circuit, print the
 accuracy."* But a model you would actually want near a clinic has to answer harder questions:
@@ -164,7 +164,7 @@ plt.tight_layout()
 plt.show()
 
 ######################################################################
-# Unique angle #1 — cost-sensitive thresholding
+# Unique angle #1, cost-sensitive thresholding
 # ----------------------------------------------
 #
 # A default 0.5 decision threshold treats a missed cancer and a false alarm as equally bad. They
@@ -208,7 +208,7 @@ for name, p in [("quantum", q_prob), ("logistic regression", c_prob)]:
 plt.plot([0, 1], [0, 1], "k--", alpha=0.4)
 plt.xlabel("false positive rate")
 plt.ylabel("true positive rate (sensitivity)")
-plt.title("ROC — quantum vs. classical")
+plt.title("ROC, quantum vs. classical")
 plt.legend(loc="lower right")
 plt.tight_layout()
 plt.show()
@@ -220,7 +220,7 @@ plt.show()
 # methodology and the research direction, not a headline accuracy win.
 
 ######################################################################
-# Unique angle #2 — selective prediction (knowing when to defer)
+# Unique angle #2, selective prediction (knowing when to defer)
 # --------------------------------------------------------------
 #
 # Instead of forcing a call on every patient, the model reports a **confidence**
@@ -243,7 +243,7 @@ plt.plot(coverage, accuracy, marker="o", ms=3, color="#27ae60")
 plt.gca().invert_xaxis()
 plt.xlabel("coverage (fraction of cases decided)")
 plt.ylabel("accuracy on accepted cases")
-plt.title("Selective prediction — abstaining buys accuracy")
+plt.title("Selective prediction, abstaining buys accuracy")
 plt.tight_layout()
 plt.show()
 
@@ -253,7 +253,7 @@ print(f"At 85% confidence: decides {at85.mean():.0%} of cases, "
       f"refers {int((~at85).sum())} patients to a doctor.")
 
 ######################################################################
-# Unique angle #3 — robustness under quantum noise
+# Unique angle #3, robustness under quantum noise
 # -------------------------------------------------
 #
 # Real quantum hardware is noisy. We re-evaluate the *already-trained* model on the
@@ -304,7 +304,7 @@ print("accuracy vs noise:", {f"{p:.2f}": round(a, 3) for p, a in zip(noise_level
 # model on near-term hardware would actually cost you.
 
 ######################################################################
-# Unique angle #4 — interpretability
+# Unique angle #4, interpretability
 # -----------------------------------
 #
 # Finally, we open the black box with **permutation importance**: shuffle one feature column at a

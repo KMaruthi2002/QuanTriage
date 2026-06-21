@@ -1,16 +1,16 @@
-"""A fully configurable quantum classifier — every knob exposed.
+"""A fully configurable quantum classifier, every knob exposed.
 
 Lets you choose:
   * **encoding / ansatz**: angle embedding, amplitude embedding, or a
     data-reuploading circuit (re-embed the data between trainable layers for more
-    expressivity — Pérez-Salinas et al. 2020).
+    expressivity, Pérez-Salinas et al. 2020).
   * **model size**: any number of qubits and layers (and re-upload depth).
   * **device / backend**: local simulators (`default.qubit`, the fast C++
     `lightning.qubit`) or real-hardware-style backends (`qiskit.aer` sampling,
-    IBM Quantum via `qiskit.remote`, AWS Braket) — see ``make_device``.
+    IBM Quantum via `qiskit.remote`, AWS Braket), see ``make_device``.
 
 Train on a fast simulator, then run the *same trained circuit* on real hardware
-with ``predict_on_device`` — the standard QML workflow.
+with ``predict_on_device``, the standard QML workflow.
 """
 
 from __future__ import annotations
@@ -152,7 +152,7 @@ class FlexibleQuantumClassifier(BaseEstimator, ClassifierMixin):
     def predict_on_device(self, X, device_name, shots=1024):
         """Run the trained circuit on a DIFFERENT backend (e.g. real hardware).
 
-        Rebuilds the qnode on `device_name` with the trained weights — this is how
+        Rebuilds the qnode on `device_name` with the trained weights, this is how
         you take a simulator-trained model to IBM Quantum / Braket.
         """
         circ = self._make_qnode(device_name=device_name, shots=shots)

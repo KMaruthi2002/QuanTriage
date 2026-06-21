@@ -5,7 +5,7 @@ project in the repo root.
 
 | file | purpose |
 |---|---|
-| `tutorial_quantum_cancer_triage.py` | the demo — a self-contained, executable sphinx-gallery tutorial (runs in ~30s) |
+| `tutorial_quantum_cancer_triage.py` | the demo, a self-contained, executable sphinx-gallery tutorial (runs in ~30s) |
 | `tutorial_quantum_cancer_triage.metadata.json` | demo metadata (title, authors, categories, references) |
 
 The demo is **self-contained** (it does not import from `../src`), as PennyLane demos must be a
@@ -44,6 +44,6 @@ demo shows up as your contribution:
 
 - Confirm `categories` against the current allowed list in the qml repo's
   `demonstrations_metadata.md` (we used `["QML", "Community"]`).
-- Keep the runtime under the demos CI limit (~10 min) — this one is well within it.
+- Keep the runtime under the demos CI limit (~10 min), this one is well within it.
 - The narrative uses reStructuredText in `#`-comment blocks separated by lines of `#`; that is the
   sphinx-gallery format PennyLane renders into the published page.

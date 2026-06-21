@@ -2,10 +2,10 @@
 
 This lets the quantum pipeline run on more than just breast cancer:
 
-  * ``breast_cancer``      — Wisconsin diagnostic, binary (malignant vs benign)
-  * ``pan_cancer_rnaseq``  — TCGA pan-cancer gene expression, 5 tumor types
+  * ``breast_cancer``     , Wisconsin diagnostic, binary (malignant vs benign)
+  * ``pan_cancer_rnaseq`` , TCGA pan-cancer gene expression, 5 tumor types
                               (BRCA breast, KIRC kidney, LUAD lung, PRAD prostate,
-                               COAD colon) — the "multiple cancers" dataset
+                               COAD colon), the "multiple cancers" dataset
 
 Add another dataset by writing a loader that returns a ``CancerDataset`` and
 registering it in ``DATASETS``.
@@ -92,7 +92,7 @@ def _ensure_pancancer() -> Path:
 
 def _multiclass_select(X_train, y_train, n_features):
     """Per-class (one-vs-rest) gene selection so every tumor type gets marker
-    genes — otherwise a global F-test starves the smallest class (colon)."""
+    genes, otherwise a global F-test starves the smallest class (colon)."""
     classes = np.unique(y_train)
     per = max(1, n_features // len(classes))
     chosen: list[int] = []

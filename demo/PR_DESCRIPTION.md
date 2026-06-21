@@ -14,16 +14,16 @@ classifier for breast-cancer diagnosis and goes beyond the usual "encode → mea
 pattern by wrapping it in four ideas that make a quantum classifier trustworthy in a real-world
 setting:
 
-1. **Selective prediction / abstention** — the model reports a confidence and *defers to a human*
+1. **Selective prediction / abstention**: the model reports a confidence and *defers to a human*
    on low-confidence cases, traced via a risk–coverage curve.
-2. **Cost-sensitive thresholding** — the decision threshold is tuned so missed malignancies
+2. **Cost-sensitive thresholding**: the decision threshold is tuned so missed malignancies
    (false negatives) are minimized, the metric that matters clinically.
-3. **Robustness under quantum noise** — the trained model is re-evaluated on `default.mixed`
+3. **Robustness under quantum noise**: the trained model is re-evaluated on `default.mixed`
    with a depolarizing channel, sweeping the noise strength.
-4. **Interpretability** — permutation importance over the real, named clinical features.
+4. **Interpretability**: permutation importance over the real, named clinical features.
 
 It also includes an **honest benchmark** against a classical logistic-regression baseline, and is
-explicit that on this small tabular problem the quantum model is *competitive, not superior* —
+explicit that on this small tabular problem the quantum model is *competitive, not superior* -
 the value is in the methodology.
 
 ### Files
@@ -52,5 +52,5 @@ Runs end-to-end in ~30 seconds on a laptop (well under the demos CI limit). Uses
 
 ### Notes for reviewers
 
-This is my first contribution — happy to adjust the narrative, categories, references, or the
+This is my first contribution, happy to adjust the narrative, categories, references, or the
 scope of the four "trust" sections based on your feedback.

@@ -1,4 +1,4 @@
-"""Showcase of the advanced quantum options — every 'Extending it' knob, live.
+"""Showcase of the advanced quantum options, every 'Extending it' knob, live.
 
 Runs on the breast-cancer data and demonstrates:
   1. Encodings / ansätze: angle vs. data-reuploading vs. amplitude embedding.
@@ -86,7 +86,7 @@ def main():
     Xtr, Xte, ytr, yte = prep(6)
     sim = FlexibleQuantumClassifier(encoding="angle", n_qubits=6, n_layers=4,
                                     epochs=25, seed=42, verbose=False).fit(Xtr, ytr)
-    sub = slice(0, 20)  # small subset — sampling backends run one circuit per shot-set
+    sub = slice(0, 20)  # small subset, sampling backends run one circuit per shot-set
     proba = sim.predict_on_device(Xte[sub], "qiskit.aer", shots=1024)
     acc = accuracy_score(yte[sub], proba[:, 1] >= 0.5)
     print(f"  same model on qiskit.aer (1024 shots, 20 test cases) -> accuracy {acc:.3f}")
@@ -100,7 +100,7 @@ def main():
     hr("SUMMARY")
     for k, v in results.items():
         print(f"  {k:14s} {v:.3f}")
-    print("\nDone. ✅  (educational/research — not a medical device)")
+    print("\nDone. ✅  (educational/research, not a medical device)")
 
 
 if __name__ == "__main__":

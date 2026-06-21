@@ -1,10 +1,10 @@
 """Run the trained U-Net to localize tumors, and visualize *where* they are.
 
-  * ``segment_image`` — per-pixel tumor probability for one 2-D scan slice.
-  * ``segment_volume`` — segment a whole 3-D volume slice-by-slice (-> 3-D mask).
-  * ``render_predicted_3d`` — 3-D surface of the PREDICTED tumor (reuses the
+  * ``segment_image``, per-pixel tumor probability for one 2-D scan slice.
+  * ``segment_volume``, segment a whole 3-D volume slice-by-slice (-> 3-D mask).
+  * ``render_predicted_3d``, 3-D surface of the PREDICTED tumor (reuses the
     imaging renderer), so a predicted mask flows straight into the 3-D view.
-  * ``demo_overlay`` — sanity panel (input / ground truth / prediction).
+  * ``demo_overlay``, sanity panel (input / ground truth / prediction).
 """
 
 from __future__ import annotations
@@ -60,7 +60,7 @@ def render_predicted_3d(img, pred_mask, spacing, show_organ: bool = True):
     """Build a 3-D Plotly figure of the predicted tumor ON the organ.
 
     Reuses the imaging renderer: a translucent organ surface for context plus the
-    predicted tumor mesh, colored by MRI intensity — so you see *where* the
+    predicted tumor mesh, colored by MRI intensity, so you see *where* the
     predicted tumor sits inside the organ.
     """
     import plotly.graph_objects as go
@@ -104,7 +104,7 @@ def demo_overlay(out_path):
             ax.imshow(im, cmap="gray" if title == "input scan" else "magma")
             ax.set_title(title if row == 0 else "")
             ax.axis("off")
-    fig.suptitle(f"Tumor localization — best val Dice {ck['val_dice']:.3f}")
+    fig.suptitle(f"Tumor localization, best val Dice {ck['val_dice']:.3f}")
     fig.tight_layout()
     fig.savefig(out_path, dpi=120)
     plt.close(fig)

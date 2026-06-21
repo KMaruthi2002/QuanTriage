@@ -102,7 +102,7 @@ def main():
     cm = confusion_matrix(ds.y_test, q_pred, labels=range(ds.n_classes))
     out = RESULTS / f"multicancer_confusion_{args.dataset}.png"
     plot_confusion(cm, ds.class_names, out,
-                   f"Quantum multi-cancer classifier — acc {q_acc:.2f}")
+                   f"Quantum multi-cancer classifier, acc {q_acc:.2f}")
 
     summary = {
         "dataset": ds.key, "name": ds.name, "classes": ds.class_names,

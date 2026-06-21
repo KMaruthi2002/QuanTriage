@@ -1,4 +1,4 @@
-"""🔬 Quantum Training Studio — bring your own data, train the quantum model live.
+"""🔬 Quantum Training Studio, bring your own data, train the quantum model live.
 
 Load a CSV (e.g. a dataset you downloaded from Kaggle), pick the target column,
 and train the variational quantum classifier while watching every epoch, the
@@ -33,7 +33,7 @@ CKPT_DIR = ROOT / "results" / "checkpoints"
 st.set_page_config(page_title="Quantum Training Studio", page_icon="🔬", layout="wide")
 
 st.title("🔬 Quantum Training Studio")
-st.caption("Bring your own data (e.g. a Kaggle CSV) and train the quantum classifier live — "
+st.caption("Bring your own data (e.g. a Kaggle CSV) and train the quantum classifier live, "
            "watch every epoch and the state of the model.")
 
 
@@ -90,7 +90,7 @@ epochs = c4.slider("Epochs", 5, 60, 25)
 st.caption(f"Classes: {', '.join(map(str, class_names))}  ·  "
            f"{numeric.shape[1]} numeric features available")
 
-with st.expander("Advanced — encoding / ansatz / backend (binary tasks)"):
+with st.expander("Advanced, encoding / ansatz / backend (binary tasks)"):
     encoding = st.selectbox("Encoding / ansatz", ["angle", "reupload", "amplitude"],
                             help="Data re-uploading is more expressive; amplitude packs 2^n "
                                  "features into n qubits.")
@@ -193,5 +193,5 @@ if st.session_state.get("go"):
             st.download_button("⬇ Download checkpoint", fh, file_name="studio_model.npz")
 
 st.divider()
-st.caption("Educational/research tool — **not a medical device.** Trains the same variational "
+st.caption("Educational/research tool, **not a medical device.** Trains the same variational "
            "quantum classifier used across the project, on any tabular data you provide.")

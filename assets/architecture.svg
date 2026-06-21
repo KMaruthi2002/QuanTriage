@@ -8,7 +8,7 @@
   </defs>
   <rect x="0" y="0" width="1000" height="700" fill="#f7f9fc"/>
 
-  <text x="500" y="34" text-anchor="middle" font-size="22" font-weight="700" fill="#16233f">QuanTriage — System Architecture</text>
+  <text x="500" y="34" text-anchor="middle" font-size="22" font-weight="700" fill="#16233f">QuanTriage, System Architecture</text>
   <g font-size="12" fill="#5a6b85">
     <rect x="372" y="48" width="13" height="13" rx="3" fill="#e7d9f7" stroke="#8e5fd6"/>
     <text x="391" y="59">Quantum</text>
@@ -54,7 +54,7 @@
     <text x="58" y="227" font-weight="600">Variational classifier</text>
     <text x="58" y="244" font-size="11.5" fill="#5a4a78">angle · amplitude · data re-uploading</text>
     <rect x="46" y="258" width="368" height="44" rx="8" fill="#e7d9f7" stroke="#c4a8ea"/>
-    <text x="58" y="277" font-weight="600">Multi-class — 5 tumor types</text>
+    <text x="58" y="277" font-weight="600">Multi-class, 5 tumor types</text>
     <text x="58" y="294" font-size="11.5" fill="#5a4a78">softmax over qubit read-outs</text>
     <rect x="46" y="308" width="368" height="44" rx="8" fill="#e7d9f7" stroke="#c4a8ea"/>
     <text x="58" y="327" font-weight="600">PyTorch hybrid</text>
@@ -94,7 +94,7 @@
   <text x="30" y="458" font-size="12" font-weight="700" fill="#8895a7" letter-spacing="1">INTERFACES</text>
   <g font-size="13.5" fill="#16233f">
     <rect x="30" y="464" width="450" height="54" rx="10" fill="#e8f0fe" stroke="#4a78c8"/>
-    <text x="255" y="486" text-anchor="middle" font-weight="600">Streamlit app — 6 tabs</text>
+    <text x="255" y="486" text-anchor="middle" font-weight="600">Streamlit app, 6 tabs</text>
     <text x="255" y="504" text-anchor="middle" font-size="11.5" fill="#3a5a90">predict · performance · trust · 3-D scan · types · localization</text>
     <rect x="520" y="464" width="450" height="54" rx="10" fill="#e8f0fe" stroke="#4a78c8"/>
     <text x="745" y="486" text-anchor="middle" font-weight="600">Live training studio</text>
@@ -109,5 +109,5 @@
   <text x="500" y="578" text-anchor="middle" font-size="13.5" font-weight="600" fill="#16233f">what (cancer type) · where (localization) · sub-regions · 3-D tumor on organ</text>
   <text x="500" y="598" text-anchor="middle" font-size="12.5" fill="#2f7a4f">selective prediction (defer to a doctor) · honest metrics · saved checkpoints</text>
 
-  <text x="500" y="638" text-anchor="middle" font-size="12" fill="#8895a7">Educational / research prototype — not a validated medical device.</text>
+  <text x="500" y="638" text-anchor="middle" font-size="12" fill="#8895a7">Educational / research prototype, not a validated medical device.</text>
 </svg>
