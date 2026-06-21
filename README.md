@@ -7,7 +7,7 @@
 ![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)
 
 <p align="center">
-  <img src="assets/thumbnail.png" alt="Quantum Cancer Triage" width="520">
+  <img src="assets/architecture.svg" alt="QuanTriage system architecture" width="860">
 </p>
 
 **QuanTriage** is a fully-local platform that combines **quantum machine learning**
@@ -40,11 +40,7 @@ And unlike most QML demos that stop at a single accuracy number, the classifiers
 
 ## Architecture — how it all fits together
 
-<p align="center">
-  <img src="assets/architecture.svg" alt="QuanTriage system architecture" width="820">
-</p>
-
-The system is four layers, top to bottom:
+The diagram up top maps the whole system — four layers, top to bottom:
 
 1. **Data sources** — three tabular feeds (the built-in breast-cancer set, the TCGA pan-cancer
    gene-expression set, and *any CSV you bring* from Kaggle) plus real **brain MRI with tumor
@@ -74,7 +70,7 @@ and capable — **not a validated medical device**.
 ## What is a variational quantum classifier?
 
 ```
- features ──▶ AngleEmbedding ──▶ StronglyEntanglingLayers ──▶  ⟨Z₀⟩  ──▶  p(malignant)
+ features ──▶ AngleEmbedding ──▶ StronglyEntanglingLayers ──▶  ⟨Z₀⟩  ──▶  p(class)
               (encode the data    (trainable rotation           (measure     = (1 − ⟨Z⟩)/2
                into qubit angles)  angles = the "weights")        qubit 0)
 ```
@@ -96,25 +92,31 @@ classical baselines.
 cd quantum-ml-pennylane
 python3.12 -m venv .venv
 .venv/bin/pip install -r requirements.txt
-.venv/bin/python src/main.py
 ```
 
 > Use **Python 3.12** — PennyLane does not yet ship wheels for 3.14.
 
-Tune the model from the CLI:
+Then pick any entry point — **no cancer is "the default":**
 
 ```bash
-.venv/bin/python src/main.py --qubits 8 --layers 6 --epochs 60 --cost-ratio 10
-```
+# classify the cancer TYPE — 5 tumor types from real genomics
+.venv/bin/python src/multicancer.py
 
-| flag | meaning | default |
-|---|---|---|
-| `--qubits` | qubits = number of (named) features used | 6 |
-| `--layers` | variational layers (model capacity) | 4 |
-| `--epochs` | training epochs | 40 |
-| `--cost-ratio` | how many times worse a missed cancer is than a false alarm | 10 |
-| `--confidence` | abstain below this confidence | 0.85 |
-| `--noise-levels` | depolarizing-noise sweep | 0 0.01 0.03 0.05 0.1 |
+# localize a tumor on real brain MRI (multi-modal U-Net, GPU)
+.venv/bin/python segmentation/multimodal.py --n_volumes 60 --epochs 22
+
+# bring your OWN data (Kaggle CSV) and train the quantum model live
+.venv/bin/streamlit run studio.py
+
+# compare encodings / hybrid / real-hardware path
+.venv/bin/python src/quantum_advanced.py
+
+# the clinically-honest breast-cancer DIAGNOSIS demo (binary)
+.venv/bin/python src/main.py
+
+# explore everything in one interactive app
+.venv/bin/streamlit run app.py
+```
 
 ### Interactive dashboard (GUI)
 
@@ -153,9 +155,14 @@ A [Streamlit](https://streamlit.io/) dashboard wraps the model in an interactive
 
 ---
 
-## Example results (default settings, seed 42)
+## Component: breast-cancer diagnosis (binary)
 
-**Quantum vs. classical** on the held-out test set:
+<p align="center">
+  <img src="assets/thumbnail.png" alt="Breast-cancer triage classifier" width="440">
+</p>
+
+One of the platform's classifiers — a clinically-honest malignant/benign diagnosis. Run it with
+`python src/main.py`. **Quantum vs. classical** on the held-out test set (default settings, seed 42):
 
 | model | accuracy | sensitivity | specificity | AUC |
 |---|---|---|---|---|
@@ -192,7 +199,7 @@ Your exact numbers will vary with the flags and seed.
 
 ---
 
-## Beyond breast cancer — multiple tumor types
+## Cancer-type classification — 5 tumor types
 
 The pipeline isn't limited to one cancer. A small **dataset registry**
 ([src/datasets.py](src/datasets.py)) runs the quantum approach on multiple real datasets, and a
@@ -371,7 +378,7 @@ segmentation/
 ├── seg_data.py         images/masks loader (Kaggle-style) + synthetic generator
 ├── train_seg.py        GPU (MPS) training with live epochs + Dice + checkpoints
 └── predict_seg.py      inference, whole-volume segmentation, 3-D render of prediction
-app.py                  Streamlit dashboard (predict · performance · trust · 3-D scan · types)
+app.py                  Streamlit dashboard (cancer types · 3-D scan · localization · breast dx)
 ```
 
 **Data note:** scikit-learn encodes the target as malignant=0/benign=1; we relabel so

@@ -143,14 +143,15 @@ threshold = cost_sensitive_threshold(data.y_test, q_prob, cost_ratio)
 
 st.title("QuanTriage")
 st.markdown(
-    "A hybrid **quantum machine learning** model that flags breast tumors as malignant or "
-    "benign — and, unlike most QML demos, **refers uncertain cases to a doctor**, is **tuned "
-    "not to miss cancer**, **survives quantum noise**, and **explains its reasoning**."
+    "A local **quantum + imaging** platform for cancer ML: classify the **cancer type** across "
+    "five tumor types, **localize** tumors in real brain MRI with a 3-D render, and train on your "
+    "own data — plus a clinically-honest **breast-cancer diagnosis** demo that defers to a doctor "
+    "when unsure. Everything runs on-device."
 )
 
-tab_predict, tab_perf, tab_trust, tab_scan, tab_types, tab_loc = st.tabs(
-    ["🩺 Predict a patient", "📊 Model performance", "🛡️ Trust & robustness",
-     "🧠 3-D tumor scan", "🧬 Cancer types", "🎯 Localization (train)"]
+tab_types, tab_scan, tab_loc, tab_predict, tab_perf, tab_trust = st.tabs(
+    ["🧬 Cancer types", "🧠 3-D tumor scan", "🎯 Localization (train)",
+     "🩺 Breast: predict", "📊 Breast: performance", "🛡️ Breast: trust"]
 )
 
 # --------------------------------------------------------------------------- #
