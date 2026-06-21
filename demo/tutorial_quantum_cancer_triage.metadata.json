@@ -1,0 +1,78 @@
+{
+    "title": "A clinically-aware quantum classifier: triage that knows when to defer",
+    "authors": [
+        {
+            "name": "Maruthi Kunchala"
+        }
+    ],
+    "dateOfPublication": "2026-06-21T00:00:00+00:00",
+    "dateOfLastModification": "2026-06-21T00:00:00+00:00",
+    "categories": [
+        "QML",
+        "Community"
+    ],
+    "tags": [
+        "quantum machine learning",
+        "variational classifier",
+        "healthcare",
+        "selective prediction",
+        "noise",
+        "interpretability"
+    ],
+    "previewImages": [
+        {
+            "type": "thumbnail",
+            "uri": "/_static/demonstration_assets/quantum_cancer_triage/thumbnail.png"
+        }
+    ],
+    "seoDescription": "Build a variational quantum classifier for breast-cancer triage that abstains on uncertain cases, is tuned not to miss malignancies, survives quantum noise, and explains itself, benchmarked honestly against classical models.",
+    "doi": "",
+    "references": [
+        {
+            "id": "perezsalinas",
+            "type": "article",
+            "title": "Data re-uploading for a universal quantum classifier",
+            "authors": "Adrian Perez-Salinas, Alba Cervera-Lierta, Elies Gil-Fuster, Jose I. Latorre",
+            "year": "2020",
+            "journal": "Quantum",
+            "doi": "10.22331/q-2020-02-06-226"
+        },
+        {
+            "id": "havlicek",
+            "type": "article",
+            "title": "Supervised learning with quantum-enhanced feature spaces",
+            "authors": "Vojtech Havlicek, Antonio D. Corcoles, Kristan Temme, Aram W. Harrow, Abhinav Kandala, Jerry M. Chow, Jay M. Gambetta",
+            "year": "2019",
+            "journal": "Nature",
+            "doi": "10.1038/s41586-019-0980-2"
+        },
+        {
+            "id": "wolberg",
+            "type": "webpage",
+            "title": "Breast Cancer Wisconsin (Diagnostic) Data Set",
+            "authors": "William Wolberg, W. Nick Street, Olvi Mangasarian",
+            "year": "1995",
+            "url": "https://archive.ics.uci.edu/dataset/17/breast+cancer+wisconsin+diagnostic"
+        }
+    ],
+    "basedOnPapers": [],
+    "referencedByPapers": [],
+    "relatedContent": [
+        {
+            "type": "demonstration",
+            "id": "tutorial_variational_classifier",
+            "weight": 1.0
+        },
+        {
+            "type": "demonstration",
+            "id": "tutorial_data_reuploading_classifier",
+            "weight": 1.0
+        },
+        {
+            "type": "demonstration",
+            "id": "tutorial_noisy_circuits",
+            "weight": 1.0
+        }
+    ],
+    "hardware": []
+}
