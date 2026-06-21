@@ -91,6 +91,8 @@ def main():
     ap = argparse.ArgumentParser(description="Train U-Net tumor segmentation")
     ap.add_argument("--images_dir")
     ap.add_argument("--masks_dir")
+    ap.add_argument("--msd_root", help="path to MSD Task01_BrainTumour dir (imagesTr/labelsTr)")
+    ap.add_argument("--n_volumes", type=int, default=60)
     ap.add_argument("--epochs", type=int, default=25)
     ap.add_argument("--batch_size", type=int, default=16)
     ap.add_argument("--base", type=int, default=32)
@@ -99,7 +101,15 @@ def main():
 
     dev = get_device()
     print(f"Device: {dev}  (Apple-Silicon GPU)" if dev.type == "mps" else f"Device: {dev}")
-    if args.images_dir and args.masks_dir:
+    if args.msd_root:
+        from msd_data import build_msd_slice_dataset
+
+        print(f"MSD Brain-Tumour: extracting slices from {args.n_volumes} volumes…")
+        train_ds, val_ds, info = build_msd_slice_dataset(
+            args.msd_root, n_volumes=args.n_volumes, size=args.size, seed=42)
+        print(f"  {info['volumes']} volumes -> {info['train_slices']} train / "
+              f"{info['val_slices']} val slices")
+    elif args.images_dir and args.masks_dir:
         full = FolderSegDataset(args.images_dir, args.masks_dir, size=args.size)
         cut = int(len(full) * 0.85)
         train_ds = torch.utils.data.Subset(full, range(cut))

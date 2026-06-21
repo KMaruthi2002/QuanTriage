@@ -192,9 +192,17 @@ backend on Apple Silicon** — on an M5 a synthetic pipeline check hits **Dice 0
 python segmentation/train_seg.py --epochs 25
 python segmentation/predict_seg.py          # writes assets/segmentation_demo.png
 
-# train on a real dataset (your own / Kaggle), images + masks folders:
+# train on real MRI — Medical Segmentation Decathlon brain-tumour volumes:
+python segmentation/train_seg.py --msd_root data_cache/msd/Task01_BrainTumour --n_volumes 60 --epochs 30
+
+# or any images + masks folders (e.g. a Kaggle dataset):
 python segmentation/train_seg.py --images_dir path/to/images --masks_dir path/to/masks --epochs 40
 ```
+
+There's also a **live "Localization (train)" tab** in the Streamlit app: pick the data source,
+hit train, and watch loss + Dice update per epoch on the GPU, then see predicted masks.
+[segmentation/msd_data.py](segmentation/msd_data.py) turns the 3-D multimodal MSD volumes into
+2-D FLAIR slices with binary tumor masks.
 
 <p align="center">
   <img src="assets/segmentation_demo.png" alt="U-Net tumor localization" width="380">

@@ -148,9 +148,9 @@ st.markdown(
     "not to miss cancer**, **survives quantum noise**, and **explains its reasoning**."
 )
 
-tab_predict, tab_perf, tab_trust, tab_scan, tab_types = st.tabs(
+tab_predict, tab_perf, tab_trust, tab_scan, tab_types, tab_loc = st.tabs(
     ["🩺 Predict a patient", "📊 Model performance", "🛡️ Trust & robustness",
-     "🧠 3-D tumor scan", "🧬 Cancer types"]
+     "🧠 3-D tumor scan", "🧬 Cancer types", "🎯 Localization (train)"]
 )
 
 # --------------------------------------------------------------------------- #
@@ -360,3 +360,86 @@ with tab_types:
     else:
         st.info("Click the button above to train the 5-type quantum classifier on real "
                 "gene-expression data.")
+
+# --------------------------------------------------------------------------- #
+# Tab 6 — tumor localization (live U-Net training on the GPU)
+# --------------------------------------------------------------------------- #
+with tab_loc:
+    st.subheader("Train a U-Net to localize tumors — live, on your GPU")
+    sys.path.insert(0, str(ROOT / "segmentation"))
+    msd_root = ROOT / "data_cache" / "msd" / "Task01_BrainTumour"
+    has_msd = msd_root.exists()
+
+    from unet import get_device
+
+    dev = get_device()
+    st.caption(f"Compute device: **{dev.type.upper()}**"
+               + ("  (Apple-Silicon GPU 🚀)" if dev.type == "mps" else ""))
+
+    sources = ["Synthetic (fast pipeline check)"]
+    if has_msd:
+        sources.insert(0, "MSD Brain-Tumour (real MRI)")
+    else:
+        st.info("MSD Brain-Tumour data not found yet — synthetic only until the download finishes.")
+    source = st.radio("Training data", sources, horizontal=True)
+    c1, c2 = st.columns(2)
+    epochs = c1.slider("Epochs", 5, 40, 15)
+    n_vol = c2.slider("MSD volumes (real only)", 10, 120, 50, 10,
+                      disabled=not source.startswith("MSD"))
+
+    if st.button("▶ Start training"):
+        st.session_state["seg_go"] = True
+    if st.session_state.get("seg_go"):
+        with st.spinner("Preparing data…"):
+            if source.startswith("MSD"):
+                from msd_data import build_msd_slice_dataset
+                train_ds, val_ds, info = build_msd_slice_dataset(
+                    str(msd_root), n_volumes=n_vol, seed=42)
+                st.write(f"Real MRI: {info['train_slices']} train / {info['val_slices']} "
+                         f"val slices from {info['volumes']} patients")
+            else:
+                from seg_data import make_synthetic
+                train_ds, val_ds = make_synthetic()
+
+        prog = st.progress(0.0)
+        status = st.empty()
+        chart = st.empty()
+        hist: list[dict] = []
+
+        def on_epoch(s):
+            hist.append(s)
+            prog.progress(s["epoch"] / s["epochs"])
+            status.markdown(
+                f"**epoch {s['epoch']}/{s['epochs']}** · train loss `{s['train_loss']:.3f}` · "
+                f"val loss `{s['val_loss']:.3f}` · **val Dice `{s['val_dice']:.3f}`** "
+                f"(best `{s['best_dice']:.3f}`)")
+            chart.line_chart(
+                {"epoch": [h["epoch"] for h in hist],
+                 "val Dice": [h["val_dice"] for h in hist],
+                 "train loss": [h["train_loss"] for h in hist]},
+                x="epoch")
+
+        from train_seg import train as train_unet
+
+        model, history = train_unet(train_ds, val_ds, epochs=epochs, on_epoch=on_epoch, device=dev)
+        best = max(h["val_dice"] for h in history)
+        st.success(f"Training complete — best validation Dice **{best:.3f}**. "
+                   f"Checkpoint saved to results/checkpoints/.")
+
+        # show a few predictions
+        import matplotlib.pyplot as _plt
+        from predict_seg import segment_image
+        st.markdown("#### Predictions (input · ground truth · U-Net)")
+        figp, axp = _plt.subplots(2, 3, figsize=(8, 5.5))
+        for r in range(2):
+            x, y = val_ds[r]
+            pr = segment_image(model, x[0].numpy(), dev)
+            for ax, im, t in zip(axp[r], [x[0].numpy(), y[0].numpy(), pr > 0.5],
+                                 ["input", "truth", "prediction"]):
+                ax.imshow(im, cmap="gray" if t == "input" else "magma")
+                ax.set_title(t if r == 0 else ""); ax.axis("off")
+        figp.tight_layout()
+        st.pyplot(figp)
+
+    st.warning("Educational/research prototype — **not a medical device.** Synthetic Dice only "
+               "validates the pipeline; real accuracy comes from training on real MRI.")
